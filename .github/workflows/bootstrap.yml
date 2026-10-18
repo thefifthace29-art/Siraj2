@@ -1,0 +1,62 @@
+
+name: Bootstrap Siraj Flutter Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: "3.29.3"
+          cache: true
+
+      - name: Create clean Flutter project
+        run: |
+          flutter create \
+            --platforms=android \
+            --org com.siraj.education \
+            --project-name siraj2 \
+            /tmp/siraj2_project
+
+          cp -a /tmp/siraj2_project/. .
+
+      - name: Check generated project
+        run: |
+          flutter --version
+          flutter pub get
+          flutter analyze
+          flutter build apk --debug
+
+      - name: Commit generated project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Create clean Flutter Android project"
+            git push
+          fi
+
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: siraj2-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
