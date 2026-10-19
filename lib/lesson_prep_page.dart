@@ -202,20 +202,16 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     });
 
     try {
-      if (groqApiKey == 'PASTE_YOUR_GROQ_API_KEY_HERE' ||
-          groqApiKey.trim().isEmpty) {
-        throw Exception('لم تتم إضافة مفتاح Groq');
-      }
+    
 
       final response = await http
           .post(
             Uri.parse(
-              'https://api.groq.com/openai/v1/chat/completions',
-            ),
+  'https://siraj-groq-proxy.thefifthace29.workers.dev',
+),
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer $groqApiKey',
-            },
+          
             body: jsonEncode({
               'model': 'openai/gpt-oss-20b',
               'messages': [
