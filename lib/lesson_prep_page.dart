@@ -178,6 +178,78 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     final previous = _previousController.text.trim();
     final notes = _notesController.text.trim();
 
+    
+  
+    final apiKey = _apiKeyController.text.trim();
+
+    if (apiKey.isNotEmpty) {
+      try {
+        final response = await http
+            .post(
+              Uri.parse(
+                'https://api.groq.com/openai/v1/chat/completions',
+              ),
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $apiKey',
+              },
+              body: jsonEncode({
+                'model': 'openai/gpt-oss-20b',
+                'messages': [
+                  {
+                    'role': 'system',
+                    'content':
+                        'أنت خبير في التربية والتعليم والمنهاج السوري. '
+                        'أعد تحضيرًا تربويًا عمليًا ومفصلًا باللغة العربية '
+                        'وفق معلومات الدرس، مع أهداف قابلة للقياس، '
+                        'وتمهيد، ووسائل، وخطوات تنفيذ محددة للمعلم، '
+                        'وأنشطة، وتقويم، وفروق فردية، وواجب منزلي. '
+                        'راعِ عمر الطلاب ونوع الدرس والزمن المحدد.',
+                  },
+                  {
+                    'role': 'user',
+                    'content':
+                        'أعد تحضير الدرس التالي:\n'
+                        'المادة: $subject\n'
+                        'الصف: $grade\n'
+                        'عنوان الدرس: $lesson\n'
+                        'الوحدة: $unit\n'
+                        'نوع الدرس: $lessonType\n'
+                        'المدة: $duration\n'
+                        'المعارف السابقة: $previous\n'
+                        'ملاحظات المعلم: $notes\n'
+                        'اجعل التحضير منظمًا بعناوين واضحة '
+                        'ومناسبًا للتطبيق داخل الصف.',
+                  },
+                ],
+                'temperature': 0.4,
+              }),
+            )
+            .timeout(const Duration(seconds: 45));
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(
+            utf8.decode(response.bodyBytes),
+          );
+
+          final result =
+              data['choices'][0]['message']['content'] as String;
+
+          if (result.trim().isNotEmpty) {
+            if (!mounted) return;
+
+            setState(() {
+              preparedLesson = result.trim();
+            });
+
+            return;
+          }
+        }
+      } catch (_) {
+        // عند فشل الاتصال نتابع إنشاء التحضير المحلي.
+      }
+    }
+
     final buffer = StringBuffer();
 
     buffer.writeln('تحضير درس: $lesson');
