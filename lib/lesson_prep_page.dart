@@ -199,18 +199,15 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     });
 
     try {
-    
-
       final response = await http
           .post(
             Uri.parse(
-  'https://siraj-groq-proxy.thefifthace29.workers.dev',
-),
+              'https://siraj-groq-proxy.thefifthace29.workers.dev',
+            ),
             headers: {
               'Content-Type': 'application/json',
-          
+            },
             body: jsonEncode({
-              'model': 'openai/gpt-oss-20b',
               'messages': [
                 {
                   'role': 'system',
@@ -242,9 +239,11 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                       'لعمر الطلاب.',
                 },
               ],
-              'temperature': 0.4,
             }),
           )
+          .timeout(const Duration(seconds: 45));
+
+    
           .timeout(const Duration(seconds: 45));
 
       if (response.statusCode != 200) {
