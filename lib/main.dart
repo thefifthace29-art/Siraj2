@@ -1,122 +1,384 @@
+
 import 'package:flutter/material.dart';
 
+const Color cream = Color(0xFFFDFBF7);
+const Color royalGreen = Color(0xFF0A4D2E);
+const Color gold = Color(0xFFD4AF37);
+const Color textColor = Color(0xFF26372D);
+
 void main() {
-  runApp(const MyApp());
+  runApp(const SirajApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SirajApp extends StatelessWidget {
+  const SirajApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'سِراج',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        scaffoldBackgroundColor: cream,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: royalGreen,
+          primary: royalGreen,
+          secondary: gold,
+        ),
+        fontFamily: 'Arial',
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void openSection(BuildContext context, String section) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'قسم $section جاهز للتطوير في المرحلة القادمة',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: royalGreen,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 22),
+                  decoration: BoxDecoration(
+                    color: royalGreen,
+                    borderRadius: BorderRadius.circular(26),
+                    border: Border.all(color: gold, width: 1.4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: royalGreen.withOpacity(0.13),
+                        blurRadius: 16,
+                        offset: const Offset(0, 7),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 68,
+                        height: 68,
+                        decoration: BoxDecoration(
+                          color: gold.withOpacity(0.13),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: gold, width: 1.5),
+                        ),
+                        child: const Icon(
+                          Icons.auto_stories_rounded,
+                          color: gold,
+                          size: 36,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'سِراج',
+                        style: TextStyle(
+                          color: gold,
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          height: 1.8,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 58,
+                        height: 2,
+                        color: gold,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'سِراج .. رفيقك في التعلم',
+                        style: TextStyle(
+                          color: Color(0xFFFDFBF7),
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'أهلًا بك في سِراج',
+                      style: TextStyle(
+                        color: royalGreen,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'مساحتك التعليمية لتنظيم التعلم ومتابعة التقدم',
+                      style: TextStyle(
+                        color: textColor.withOpacity(0.72),
+                        fontSize: 14,
+                        height: 1.7,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'أقسام التطبيق',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              sliver: SliverGrid(
+                delegate: SliverChildListDelegate([
+                  SectionCard(
+                    title: 'العربية لغتي',
+                    subtitle: 'الكتاب والأنشطة والاختبارات',
+                    icon: Icons.menu_book_rounded,
+                    color: royalGreen,
+                    number: '١',
+                    onTap: () => openSection(context, 'العربية لغتي'),
+                  ),
+                  SectionCard(
+                    title: 'الرياضيات',
+                    subtitle: 'المفاهيم والتدريبات',
+                    icon: Icons.calculate_rounded,
+                    color: const Color(0xFF426B55),
+                    number: '٢',
+                    onTap: () => openSection(context, 'الرياضيات'),
+                  ),
+                  SectionCard(
+                    title: 'متابعة الطلاب',
+                    subtitle: 'الحضور والمستوى والتقدم',
+                    icon: Icons.groups_rounded,
+                    color: const Color(0xFF8A6A22),
+                    number: '٣',
+                    onTap: () => openSection(context, 'متابعة الطلاب'),
+                  ),
+                  SectionCard(
+                    title: 'تحضير الدروس',
+                    subtitle: 'خطط تعليمية منظمة',
+                    icon: Icons.edit_note_rounded,
+                    color: const Color(0xFF526C83),
+                    number: '٤',
+                    onTap: () => openSection(context, 'تحضير الدروس'),
+                  ),
+                ]),
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.88,
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Divider(color: gold, thickness: 1),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            color: gold,
+                            size: 22,
+                          ),
+                        ),
+                        const Expanded(
+                          child: Divider(color: gold, thickness: 1),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'إعداد وتصميم',
+                      style: TextStyle(
+                        color: royalGreen,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'مُعتز محمد الأحمد',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'مدرسةُ الأندلس الثالثة',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class SectionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final String number;
+  final VoidCallback onTap;
+
+  const SectionCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.number,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: gold.withOpacity(0.75),
+              width: 1.1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Icon(icon, color: color, size: 29),
+                  ),
+                  Text(
+                    number,
+                    style: TextStyle(
+                      color: gold.withOpacity(0.95),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Color(0xFF6B746D),
+                  fontSize: 12,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    'استكشاف القسم',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_back_rounded,
+                    color: color,
+                    size: 15,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
