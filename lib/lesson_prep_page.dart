@@ -21,6 +21,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   final _unitController = TextEditingController();
   final _previousController = TextEditingController();
   final _notesController = TextEditingController();
+  final _apiKeyController = TextEditingController();
 
   String subject = 'العربية لغتي';
   String grade = 'الصف الثاني الابتدائي';
@@ -35,6 +36,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     _unitController.dispose();
     _previousController.dispose();
     _notesController.dispose();
+    _apiKeyController.dispose();
     super.dispose();
   }
 
