@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 const Color cream = Color(0xFFFDFBF7);
@@ -28,25 +29,171 @@ class SirajApp extends StatelessWidget {
         ),
         fontFamily: 'Arial',
       ),
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
+      builder: (context, child) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: child!,
+      ),
       home: const HomePage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
-  void openSection(BuildContext context, String section) {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late DateTime now;
+  Timer? clockTimer;
+
+  final List<String> wisdoms = [
+    'التعليم رسالة تبني العقول وتصنع المستقبل.',
+    'المعلم الناجح يزرع حب التعلم قبل أن يزرع المعرفة.',
+    'كل طفل قادر على التعلم إذا وجد من يؤمن بقدراته.',
+    'الكلمة الطيبة من المعلم قد تبقى في ذاكرة الطالب عمرًا.',
+    'التشجيع يفتح أبوابًا قد يعجز التوبيخ عن فتحها.',
+    'ليس النجاح أن يتقدم طالب وحده، بل أن يجد كل طالب طريقه.',
+    'الصبر في التعليم استثمار تظهر ثماره مع الأيام.',
+    'السؤال الجيد بداية معرفة جديدة.',
+    'الخطأ فرصة للتعلم، وليس سببًا للخجل.',
+    'ازرع في طلابك الثقة، ثم علّمهم كيف يحققون أهدافهم.',
+    'القراءة نافذة يطل منها العقل على العالم.',
+    'التعلم الحقيقي أن يعرف الطالب كيف يفكر، لا ماذا يحفظ فقط.',
+    'وراء كل إنجاز صغير جهد يستحق التقدير.',
+    'العدل بين الطلاب أساس الثقة داخل الصف.',
+    'الاستماع إلى الطالب أول خطوة لفهمه.',
+    'المعلم قدوة بأفعاله قبل أقواله.',
+    'البيئة الآمنة تجعل الطفل أكثر استعدادًا للتعلم.',
+    'التكرار الهادف يرسخ المهارة ويزيد الثقة.',
+    'لا تقارن طفلًا بآخر؛ قارن تقدمه بما كان عليه.',
+    'النجاح في التعليم يبدأ بهدف واضح وخطوة صغيرة.',
+    'كل حصة فرصة لاكتشاف قدرة جديدة لدى أحد الطلاب.',
+    'التعلم باللعب يجعل المعرفة أقرب إلى قلب الطفل.',
+    'الانضباط الناجح يقوم على الاحترام والوضوح.',
+    'الطفل الذي يُمنح فرصة للمحاولة يتعلم الشجاعة.',
+    'الأساس المتين أهم من السرعة في إنهاء الدروس.',
+    'الإنصات الجيد يعلم الطالب أن صوته مهم.',
+    'التحفيز الصادق أقوى من المكافأة وحدها.',
+    'من حق كل طالب أن يتعلم وفق حاجته وقدرته.',
+    'التعليم الجيد ينمي الفضول ولا يطفئه.',
+    'خطوة متقنة اليوم تمهد لخطوات أكبر غدًا.',
+    'حين يشعر الطالب بالأمان يصبح الخطأ بداية لا نهاية.',
+    'التعاون بين الطلاب يحول الصف إلى مجتمع متعلم.',
+    'المعلم المبدع يجد أكثر من طريق للوصول إلى الفهم.',
+    'لا تستهن بسؤال صغير؛ فقد يقود إلى اكتشاف كبير.',
+    'النجاح المدرسي ثمرة تعاون المعلم والطالب والأسرة.',
+    'الطفل يحتاج إلى من يوجهه، لا إلى من يذكّره بعجزه.',
+    'تنويع أساليب التدريس يمنح فرصًا أوسع للفهم.',
+    'التعليم ليس ملء الذاكرة، بل إيقاظ العقل.',
+    'احترم اختلاف الطلاب؛ فلكل عقل إيقاعه الخاص.',
+    'الثناء على الجهد يعلم الطفل قيمة المثابرة.',
+    'الهدف من الواجب أن يعزز التعلم لا أن يرهق الطفل.',
+    'الصف الجميل هو الذي يشعر فيه كل طالب بأنه مهم.',
+    'المعرفة تزداد قيمة عندما تتحول إلى سلوك نافع.',
+    'ازرع عادة السؤال، تنمُ لدى الطالب رغبة الاكتشاف.',
+    'أجمل أثر للمعلم أن يصبح الطالب قادرًا على التعلم بنفسه.',
+    'الرفق في التعليم ليس ضعفًا، بل حكمة في بناء الإنسان.',
+    'التقدم البطيء مع الفهم أفضل من السرعة بلا إتقان.',
+    'من علّم طفلًا احترام المعرفة فتح له بابًا للمستقبل.',
+    'الاستمرار في المحاولة جزء أساسي من طريق النجاح.',
+    'وراء كل طالب متعثر قدرة تنتظر الطريقة المناسبة.',
+    'التعليم الناجح يجمع بين المعرفة والأخلاق والرحمة.',
+    'علّم طلابك أن اختلاف الإجابات قد يكون بداية للحوار.',
+    'كل يوم دراسي جديد فرصة لبداية أفضل.',
+    'المعلم الذي يتعلم باستمرار يمنح طلابه مثالًا حيًا.',
+    'بناء الشخصية لا يقل أهمية عن تحصيل المعلومات.',
+    'اجعل من الصف مكانًا يجرؤ فيه الطالب على التفكير.',
+    'الاهتمام بالتفاصيل الصغيرة يصنع فرقًا كبيرًا في التعلم.',
+    'لا يوجد جهد صادق في التعليم يضيع بلا أثر.',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    now = DateTime.now();
+
+    clockTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) {
+        if (mounted) {
+          setState(() {
+            now = DateTime.now();
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    clockTimer?.cancel();
+    super.dispose();
+  }
+
+  String arabicDigits(String value) {
+    const western = '0123456789';
+    const eastern = '٠١٢٣٤٥٦٧٨٩';
+
+    for (int i = 0; i < western.length; i++) {
+      value = value.replaceAll(western[i], eastern[i]);
+    }
+    return value;
+  }
+
+  String get formattedTime {
+    final hour = now.hour.toString().padLeft(2, '0');
+    final minute = now.minute.toString().padLeft(2, '0');
+    return arabicDigits('$hour:$minute');
+  }
+
+  String get formattedDate {
+    const weekdays = [
+      'الاثنين',
+      'الثلاثاء',
+      'الأربعاء',
+      'الخميس',
+      'الجمعة',
+      'السبت',
+      'الأحد',
+    ];
+
+    const months = [
+      'كانون الثاني',
+      'شباط',
+      'آذار',
+      'نيسان',
+      'أيار',
+      'حزيران',
+      'تموز',
+      'آب',
+      'أيلول',
+      'تشرين الأول',
+      'تشرين الثاني',
+      'كانون الأول',
+    ];
+
+    final weekday = weekdays[now.weekday - 1];
+    final month = months[now.month - 1];
+
+    return '$weekday، ${arabicDigits(now.day.toString())} '
+        '$month ${arabicDigits(now.year.toString())}';
+  }
+
+  int get dailyWisdomIndex {
+    final today = DateTime(now.year, now.month, now.day);
+    final firstDay = DateTime(2026, 1, 1);
+    final dayNumber = today.difference(firstDay).inDays;
+    return dayNumber % wisdoms.length;
+  }
+
+  void openSection(String section) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'قسم $section جاهز للتطوير في المرحلة القادمة',
+          'سنبدأ بتطوير قسم $section في المرحلة القادمة',
           textAlign: TextAlign.center,
         ),
         backgroundColor: royalGreen,
@@ -63,71 +210,69 @@ class HomePage extends StatelessWidget {
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 22),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: royalGreen,
-                    borderRadius: BorderRadius.circular(26),
-                    border: Border.all(color: gold, width: 1.4),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: gold, width: 1.3),
                     boxShadow: [
                       BoxShadow(
-                        color: royalGreen.withOpacity(0.13),
-                        blurRadius: 16,
-                        offset: const Offset(0, 7),
+                        color: royalGreen.withOpacity(0.12),
+                        blurRadius: 14,
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
                   child: Column(
                     children: [
                       Container(
-                        width: 68,
-                        height: 68,
+                        width: 58,
+                        height: 58,
                         decoration: BoxDecoration(
-                          color: gold.withOpacity(0.13),
                           shape: BoxShape.circle,
-                          border: Border.all(color: gold, width: 1.5),
+                          color: gold.withOpacity(0.13),
+                          border: Border.all(color: gold, width: 1.4),
                         ),
                         child: const Icon(
                           Icons.auto_stories_rounded,
                           color: gold,
-                          size: 36,
+                          size: 32,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       const Text(
                         'سِراج',
                         style: TextStyle(
                           color: gold,
-                          fontSize: 36,
+                          fontSize: 34,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       const Text(
                         '﴿ وَقُل رَّبِّ زِدْنِي عِلْمًا ﴾',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 19,
+                          fontSize: 18,
                           height: 1.8,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 58,
-                        height: 2,
-                        color: gold,
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 7),
+                      Container(width: 50, height: 2, color: gold),
+                      const SizedBox(height: 9),
                       const Text(
                         'سِراج .. رفيقك في التعلم',
                         style: TextStyle(
-                          color: Color(0xFFFDFBF7),
-                          fontSize: 15,
+                          color: cream,
+                          fontSize: 14,
                         ),
                       ),
                     ],
@@ -135,44 +280,289 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
+
+            // بطاقة المعلم والمدرسة
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 15),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: gold.withOpacity(0.8),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: royalGreen.withOpacity(0.09),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.school_rounded,
+                          color: royalGreen,
+                          size: 29,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'المُعَلِّم',
+                              style: TextStyle(
+                                color: Color(0xFF7B806F),
+                                fontSize: 12,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'مُعتز محمد الأحمد',
+                              style: TextStyle(
+                                color: royalGreen,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  color: gold,
+                                  size: 16,
+                                ),
+                                SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    'مدرسةُ الأندلس الثالثة',
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // بطاقة الوقت والتاريخ
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 15,
+                  ),
+                  decoration: BoxDecoration(
+                    color: royalGreen,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: gold.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.access_time_rounded,
+                          color: gold,
+                          size: 27,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'الوقت والتاريخ',
+                              style: TextStyle(
+                                color: Color(0xFFE7D9A5),
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              formattedDate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        formattedTime,
+                        style: const TextStyle(
+                          color: gold,
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // حكمة اليوم
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(19),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF9E8),
+                    borderRadius: BorderRadius.circular(23),
+                    border: Border.all(
+                      color: gold.withOpacity(0.85),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 43,
+                            height: 43,
+                            decoration: BoxDecoration(
+                              color: gold.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.lightbulb_rounded,
+                              color: royalGreen,
+                              size: 27,
+                            ),
+                          ),
+                          const SizedBox(width: 11),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'حكمة اليوم',
+                                  style: TextStyle(
+                                    color: royalGreen,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 3),
+                                Text(
+                                  'فكرة تربوية ترافق يومك',
+                                  style: TextStyle(
+                                    color: Color(0xFF77715F),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.format_quote_rounded,
+                            color: gold,
+                            size: 32,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 17),
+                      Text(
+                        wisdoms[dailyWisdomIndex],
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 17,
+                          height: 1.9,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 13),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 25,
+                            height: 2,
+                            color: gold,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'الحكمة ${arabicDigits((dailyWisdomIndex + 1).toString())} من ${arabicDigits(wisdoms.length.toString())}',
+                            style: const TextStyle(
+                              color: royalGreen,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 25,
+                            height: 2,
+                            color: gold,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // الأقسام الرئيسية
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'أهلًا بك في سِراج',
+                      'أقسام سِراج',
                       style: TextStyle(
                         color: royalGreen,
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 7),
+                    const SizedBox(height: 6),
                     Text(
-                      'مساحتك التعليمية لتنظيم التعلم ومتابعة التقدم',
+                      'اختر القسم الذي تريد العمل فيه',
                       style: TextStyle(
                         color: textColor.withOpacity(0.72),
-                        fontSize: 14,
-                        height: 1.7,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'أقسام التطبيق',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverGrid(
                 delegate: SliverChildListDelegate([
                   SectionCard(
@@ -180,69 +570,49 @@ class HomePage extends StatelessWidget {
                     subtitle: 'الكتاب والأنشطة والاختبارات',
                     icon: Icons.menu_book_rounded,
                     color: royalGreen,
-                    number: '١',
-                    onTap: () => openSection(context, 'العربية لغتي'),
+                    onTap: () => openSection('العربية لغتي'),
                   ),
                   SectionCard(
                     title: 'الرياضيات',
                     subtitle: 'المفاهيم والتدريبات',
                     icon: Icons.calculate_rounded,
                     color: const Color(0xFF426B55),
-                    number: '٢',
-                    onTap: () => openSection(context, 'الرياضيات'),
+                    onTap: () => openSection('الرياضيات'),
                   ),
                   SectionCard(
                     title: 'متابعة الطلاب',
                     subtitle: 'الحضور والمستوى والتقدم',
                     icon: Icons.groups_rounded,
                     color: const Color(0xFF8A6A22),
-                    number: '٣',
-                    onTap: () => openSection(context, 'متابعة الطلاب'),
+                    onTap: () => openSection('متابعة الطلاب'),
                   ),
                   SectionCard(
                     title: 'تحضير الدروس',
                     subtitle: 'خطط تعليمية منظمة',
                     icon: Icons.edit_note_rounded,
                     color: const Color(0xFF526C83),
-                    number: '٤',
-                    onTap: () => openSection(context, 'تحضير الدروس'),
+                    onTap: () => openSection('تحضير الدروس'),
                   ),
                 ]),
                 gridDelegate:
                     const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 13,
+                  crossAxisSpacing: 13,
                   childAspectRatio: 0.88,
                 ),
               ),
             ),
+
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
+                padding: const EdgeInsets.fromLTRB(20, 25, 20, 24),
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Divider(color: gold, thickness: 1),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(
-                            Icons.auto_awesome_rounded,
-                            color: gold,
-                            size: 22,
-                          ),
-                        ),
-                        const Expanded(
-                          child: Divider(color: gold, thickness: 1),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
+                    const Divider(color: gold, thickness: 1),
+                    const SizedBox(height: 10),
                     const Text(
-                      'إعداد وتصميم',
+                      'سِراج .. رفيقك في التعلم',
                       style: TextStyle(
                         color: royalGreen,
                         fontSize: 13,
@@ -250,21 +620,11 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    const Text(
-                      'مُعتز محمد الأحمد',
-                      textAlign: TextAlign.center,
+                    Text(
+                      'نسأل الله علمًا نافعًا وعملًا صالحًا',
                       style: TextStyle(
-                        color: textColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'مدرسةُ الأندلس الثالثة',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 13,
+                        color: textColor.withOpacity(0.7),
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -283,7 +643,6 @@ class SectionCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Color color;
-  final String number;
   final VoidCallback onTap;
 
   const SectionCard({
@@ -292,7 +651,6 @@ class SectionCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.color,
-    required this.number,
     required this.onTap,
   });
 
@@ -316,27 +674,14 @@ class SectionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Icon(icon, color: color, size: 29),
-                  ),
-                  Text(
-                    number,
-                    style: TextStyle(
-                      color: gold.withOpacity(0.95),
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              Container(
+                width: 47,
+                height: 47,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(icon, color: color, size: 28),
               ),
               const Spacer(),
               Text(
@@ -359,12 +704,14 @@ class SectionCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(
-                    'استكشاف القسم',
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                  Flexible(
+                    child: Text(
+                      'استكشاف القسم',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 4),
