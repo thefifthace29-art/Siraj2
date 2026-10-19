@@ -1,6 +1,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:pdfx/pdfx.dart';
 
 const Color cream = Color(0xFFFDFBF7);
 const Color royalGreen = Color(0xFF0A4D2E);
@@ -37,6 +38,8 @@ class SirajApp extends StatelessWidget {
     );
   }
 }
+
+// ==================== الصفحة الرئيسية ====================
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -114,14 +117,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     now = DateTime.now();
-
     clockTimer = Timer.periodic(
       const Duration(seconds: 30),
       (_) {
         if (mounted) {
-          setState(() {
-            now = DateTime.now();
-          });
+          setState(() => now = DateTime.now());
         }
       },
     );
@@ -136,7 +136,6 @@ class _HomePageState extends State<HomePage> {
   String arabicDigits(String value) {
     const western = '0123456789';
     const eastern = '٠١٢٣٤٥٦٧٨٩';
-
     for (int i = 0; i < western.length; i++) {
       value = value.replaceAll(western[i], eastern[i]);
     }
@@ -159,7 +158,6 @@ class _HomePageState extends State<HomePage> {
       'السبت',
       'الأحد',
     ];
-
     const months = [
       'كانون الثاني',
       'شباط',
@@ -175,25 +173,33 @@ class _HomePageState extends State<HomePage> {
       'كانون الأول',
     ];
 
-    final weekday = weekdays[now.weekday - 1];
-    final month = months[now.month - 1];
-
-    return '$weekday، ${arabicDigits(now.day.toString())} '
-        '$month ${arabicDigits(now.year.toString())}';
+    return '${weekdays[now.weekday - 1]}، '
+        '${arabicDigits(now.day.toString())} '
+        '${months[now.month - 1]} '
+        '${arabicDigits(now.year.toString())}';
   }
 
   int get dailyWisdomIndex {
     final today = DateTime(now.year, now.month, now.day);
     final firstDay = DateTime(2026, 1, 1);
-    final dayNumber = today.difference(firstDay).inDays;
-    return dayNumber % wisdoms.length;
+    return today.difference(firstDay).inDays % wisdoms.length;
   }
 
   void openSection(String section) {
+    if (section == 'العربية لغتي') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ArabicPage(),
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'سنبدأ بتطوير قسم $section في المرحلة القادمة',
+          'سيتم تطوير قسم $section في المرحلة القادمة',
           textAlign: TextAlign.center,
         ),
         backgroundColor: royalGreen,
@@ -270,10 +276,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 9),
                       const Text(
                         'سِراج .. رفيقك في التعلم',
-                        style: TextStyle(
-                          color: cream,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: cream, fontSize: 14),
                       ),
                     ],
                   ),
@@ -290,9 +293,7 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: gold.withOpacity(0.8),
-                    ),
+                    border: Border.all(color: gold.withOpacity(0.8)),
                   ),
                   child: Row(
                     children: [
@@ -359,7 +360,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // بطاقة الوقت والتاريخ
+            // الوقت والتاريخ
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 13, 16, 0),
@@ -502,30 +503,16 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 13),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 25,
-                            height: 2,
-                            color: gold,
+                      Center(
+                        child: Text(
+                          'الحكمة ${arabicDigits((dailyWisdomIndex + 1).toString())} '
+                          'من ${arabicDigits(wisdoms.length.toString())}',
+                          style: const TextStyle(
+                            color: royalGreen,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'الحكمة ${arabicDigits((dailyWisdomIndex + 1).toString())} من ${arabicDigits(wisdoms.length.toString())}',
-                            style: const TextStyle(
-                              color: royalGreen,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            width: 25,
-                            height: 2,
-                            color: gold,
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
@@ -560,7 +547,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverGrid(
@@ -603,7 +589,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 25, 20, 24),
@@ -637,6 +622,421 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+// ==================== قسم العربية لغتي ====================
+
+class ArabicPage extends StatelessWidget {
+  const ArabicPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        title: const Text(
+          'العربية لغتي',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: royalGreen,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: gold, width: 1.2),
+            ),
+            child: const Column(
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  color: gold,
+                  size: 48,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'العربية لغتي',
+                  style: TextStyle(
+                    color: gold,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'الصف الثاني الابتدائي',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'الكتاب هو مرجع التحضير والأنشطة والتقويم',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    height: 1.7,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          ArabicFeatureCard(
+            icon: Icons.book_rounded,
+            title: 'الكتاب المدرسي',
+            subtitle: 'الكتاب الكامل داخل التطبيق، دون إنترنت',
+            color: royalGreen,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TextbookPage(),
+                ),
+              );
+            },
+          ),
+          ArabicFeatureCard(
+            icon: Icons.edit_note_rounded,
+            title: 'تحضير الدروس',
+            subtitle: 'تحضير منظم مرتبط بالدروس وأهدافها',
+            color: const Color(0xFF526C83),
+            onTap: () => showComingSoon(context, 'تحضير الدروس'),
+          ),
+          ArabicFeatureCard(
+            icon: Icons.extension_rounded,
+            title: 'الأنشطة الشفهية والكتابية',
+            subtitle: 'الاستماع والتعبير والإملاء والتدريبات',
+            color: const Color(0xFF8A6A22),
+            onTap: () => showComingSoon(context, 'الأنشطة الشفهية والكتابية'),
+          ),
+          ArabicFeatureCard(
+            icon: Icons.assignment_rounded,
+            title: 'أوراق العمل والامتحانات',
+            subtitle: 'تدريبات وتقويمات مرتبطة بمحتوى الكتاب',
+            color: const Color(0xFF426B55),
+            onTap: () => showComingSoon(context, 'أوراق العمل والامتحانات'),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'سنطوّر بقية الأدوات تدريجيًا، مع اعتماد الكتاب المدرسي مرجعًا أساسيًا.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textColor,
+              height: 1.8,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ArabicFeatureCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const ArabicFeatureCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.white,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 13),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: gold.withOpacity(0.65)),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(icon, color: color, size: 30),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF6B746D),
+                        fontSize: 12,
+                        height: 1.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: gold,
+                size: 18,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void showComingSoon(BuildContext context, String feature) {
+  showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      title: const Text(
+        'قيد التطوير',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: royalGreen,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Text(
+        'سنطوّر $feature في المرحلة القادمة، مع ربطها بمحتوى الكتاب المدرسي.',
+        textAlign: TextAlign.center,
+      ),
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: royalGreen,
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('حسنًا'),
+        ),
+      ],
+    ),
+  );
+}
+
+// ==================== عارض الكتاب المدرسي ====================
+
+class TextbookPage extends StatefulWidget {
+  const TextbookPage({super.key});
+
+  @override
+  State<TextbookPage> createState() => _TextbookPageState();
+}
+
+class _TextbookPageState extends State<TextbookPage> {
+  late final PdfControllerPinch pdfController;
+  int currentPage = 1;
+  int totalPages = 0;
+  Object? loadingError;
+
+  @override
+  void initState() {
+    super.initState();
+
+    pdfController = PdfControllerPinch(
+      document: PdfDocument.openAsset('arabic_grade2_term1.pdf'),
+    );
+
+    pdfController.document.then((document) {
+      if (mounted) {
+        setState(() {
+          totalPages = document.pagesCount;
+        });
+      }
+    }).catchError((error) {
+      if (mounted) {
+        setState(() {
+          loadingError = error;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    pdfController.dispose();
+    super.dispose();
+  }
+
+  void goToPreviousPage() {
+    if (currentPage > 1) {
+      pdfController.previousPage(
+        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 250),
+      );
+    }
+  }
+
+  void goToNextPage() {
+    if (totalPages > 0 && currentPage < totalPages) {
+      pdfController.nextPage(
+        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 250),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        title: const Text(
+          'الكتاب المدرسي',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            color: const Color(0xFFECE6D8),
+            child: Row(
+              children: [
+                IconButton(
+                  tooltip: 'الصفحة السابقة',
+                  onPressed: goToPreviousPage,
+                  icon: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: royalGreen,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    totalPages == 0
+                        ? 'كتاب العربية لغتي'
+                        : 'الصفحة ${currentPage.toString()} من ${totalPages.toString()}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: royalGreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'الصفحة التالية',
+                  onPressed: goToNextPage,
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: royalGreen,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: loadingError != null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.redAccent,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'تعذّر فتح الكتاب.',
+                            style: TextStyle(
+                              color: royalGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'تحقّق من اسم ملف PDF ومساره في المستودع، ثم أعد البناء.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(height: 1.7),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : PdfViewPinch(
+                    controller: pdfController,
+                    onPageChanged: (page) {
+                      if (mounted) {
+                        setState(() => currentPage = page);
+                      }
+                    },
+                    builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
+                      options: const DefaultBuilderOptions(),
+                      documentLoaderBuilder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: royalGreen,
+                        ),
+                      ),
+                      pageLoaderBuilder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: royalGreen,
+                        ),
+                      ),
+                      errorBuilder: (_, error) => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text(
+                            'حدث خطأ أثناء عرض صفحات الكتاب.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== بطاقة القسم الرئيسية ====================
 
 class SectionCard extends StatelessWidget {
   final String title;
@@ -678,7 +1078,7 @@ class SectionCard extends StatelessWidget {
                 width: 47,
                 height: 47,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.10),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(icon, color: color, size: 28),
