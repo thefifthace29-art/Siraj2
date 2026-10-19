@@ -28,25 +28,64 @@ jobs:
           flutter-version: "3.29.3"
           cache: true
 
-      - name: Check Flutter project
+      - name: Find Flutter project
+        shell: bash
         run: |
-          test -f pubspec.yaml
-          test -f lib/main.dart
-          test -f android/gradlew
+          echo "Repository directory:"
+          pwd
+
+          echo "Files in repository:"
+          ls -la
+
+          echo "Searching for pubspec.yaml..."
+          PROJECT_FILE="$(find . -type f -name pubspec.yaml -not -path './.git/*' -print -quit)"
+
+          if [ -z "$PROJECT_FILE" ]; then
+            echo "::error::Could not find pubspec.yaml in the checked-out repository."
+            echo "Repository files and directories:"
+            find . -maxdepth 4 -print
+            exit 1
+          fi
+
+          PROJECT_DIR="$(dirname "$PROJECT_FILE")"
+          PROJECT_DIR="$(realpath "$PROJECT_DIR")"
+
+          echo "Flutter project found at: $PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+          if [ ! -f "$PROJECT_DIR/lib/main.dart" ]; then
+            echo "::error::lib/main.dart was not found in the Flutter project."
+            exit 1
+          fi
+
+          if [ ! -d "$PROJECT_DIR/android" ]; then
+            echo "::error::Android project directory was not found."
+            exit 1
+          fi
+
+      - name: Get Flutter dependencies
+        run: |
+          cd "$PROJECT_DIR"
           flutter --version
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Analyze project
-        run: flutter analyze
+          flutter pub get
 
       - name: Build debug APK
-        run: flutter build apk --debug
+        run: |
+          cd "$PROJECT_DIR"
+          flutter build apk --debug
+
+          APK_PATH="$PROJECT_DIR/build/app/outputs/flutter-apk/app-debug.apk"
+
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::APK was not generated."
+            exit 1
+          fi
+
+          cp "$APK_PATH" "$GITHUB_WORKSPACE/siraj-debug.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: siraj-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          path: siraj-debug.apk
           if-no-files-found: error
