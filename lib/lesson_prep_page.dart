@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,9 @@ import 'package:http/http.dart' as http;
 const Color prepGreen = Color(0xFF0A4D2E);
 const Color prepGold = Color(0xFFD4AF37);
 const Color prepCream = Color(0xFFFDFBF7);
+
+// ضع مفتاح Groq الخاص بك هنا على هاتفك فقط.
+const String groqApiKey = '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';
 
 class LessonPrepPage extends StatefulWidget {
   const LessonPrepPage({super.key});
@@ -16,12 +20,10 @@ class LessonPrepPage extends StatefulWidget {
 
 class _LessonPrepPageState extends State<LessonPrepPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _lessonController = TextEditingController();
   final _unitController = TextEditingController();
   final _previousController = TextEditingController();
   final _notesController = TextEditingController();
-  final _apiKeyController = TextEditingController();
 
   String subject = 'العربية لغتي';
   String grade = 'الصف الثاني الابتدائي';
@@ -29,6 +31,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   String lessonType = 'درس جديد';
 
   String? preparedLesson;
+  bool isGenerating = false;
 
   @override
   void dispose() {
@@ -36,7 +39,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     _unitController.dispose();
     _previousController.dispose();
     _notesController.dispose();
-    _apiKeyController.dispose();
     super.dispose();
   }
 
@@ -70,20 +72,28 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: icon == null ? null : Icon(icon, color: prepGreen),
+      prefixIcon:
+          icon == null ? null : Icon(icon, color: prepGreen),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: prepGold.withOpacity(0.6)),
+        borderSide: BorderSide(
+          color: prepGold.withOpacity(0.6),
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(color: prepGold.withOpacity(0.6)),
+        borderSide: BorderSide(
+          color: prepGold.withOpacity(0.6),
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: prepGreen, width: 1.5),
+        borderSide: const BorderSide(
+          color: prepGreen,
+          width: 1.5,
+        ),
       ),
     );
   }
@@ -99,9 +109,14 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      textInputAction:
-          maxLines > 1 ? TextInputAction.newline : TextInputAction.next,
-      decoration: fieldDecoration(label, hint: hint, icon: icon),
+      textInputAction: maxLines > 1
+          ? TextInputAction.newline
+          : TextInputAction.next,
+      decoration: fieldDecoration(
+        label,
+        hint: hint,
+        icon: icon,
+      ),
       validator: requiredField
           ? (value) {
               if (value == null || value.trim().isEmpty) {
@@ -151,7 +166,9 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(color: prepGold.withOpacity(0.55)),
+        border: Border.all(
+          color: prepGold.withOpacity(0.55),
+        ),
         boxShadow: [
           BoxShadow(
             color: prepGreen.withOpacity(0.035),
@@ -171,6 +188,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   }
 
   Future<void> generatePreparation() async {
+    if (isGenerating) return;
     if (!_formKey.currentState!.validate()) return;
 
     final lesson = _lessonController.text.trim();
@@ -178,75 +196,93 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     final previous = _previousController.text.trim();
     final notes = _notesController.text.trim();
 
-    
-  
-    final apiKey = _apiKeyController.text.trim();
+    setState(() {
+      isGenerating = true;
+      preparedLesson = null;
+    });
 
-    if (apiKey.isNotEmpty) {
-      try {
-        final response = await http
-            .post(
-              Uri.parse(
-                'https://api.groq.com/openai/v1/chat/completions',
-              ),
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $apiKey',
-              },
-              body: jsonEncode({
-                'model': 'openai/gpt-oss-20b',
-                'messages': [
-                  {
-                    'role': 'system',
-                    'content':
-                        'أنت خبير في التربية والتعليم والمنهاج السوري. '
-                        'أعد تحضيرًا تربويًا عمليًا ومفصلًا باللغة العربية '
-                        'وفق معلومات الدرس، مع أهداف قابلة للقياس، '
-                        'وتمهيد، ووسائل، وخطوات تنفيذ محددة للمعلم، '
-                        'وأنشطة، وتقويم، وفروق فردية، وواجب منزلي. '
-                        'راعِ عمر الطلاب ونوع الدرس والزمن المحدد.',
-                  },
-                  {
-                    'role': 'user',
-                    'content':
-                        'أعد تحضير الدرس التالي:\n'
-                        'المادة: $subject\n'
-                        'الصف: $grade\n'
-                        'عنوان الدرس: $lesson\n'
-                        'الوحدة: $unit\n'
-                        'نوع الدرس: $lessonType\n'
-                        'المدة: $duration\n'
-                        'المعارف السابقة: $previous\n'
-                        'ملاحظات المعلم: $notes\n'
-                        'اجعل التحضير منظمًا بعناوين واضحة '
-                        'ومناسبًا للتطبيق داخل الصف.',
-                  },
-                ],
-                'temperature': 0.4,
-              }),
-            )
-            .timeout(const Duration(seconds: 45));
+    try {
+      if (groqApiKey == 'PASTE_YOUR_GROQ_API_KEY_HERE' ||
+          groqApiKey.trim().isEmpty) {
+        throw Exception('لم تتم إضافة مفتاح Groq');
+      }
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(
-            utf8.decode(response.bodyBytes),
-          );
+      final response = await http
+          .post(
+            Uri.parse(
+              'https://api.groq.com/openai/v1/chat/completions',
+            ),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $groqApiKey',
+            },
+            body: jsonEncode({
+              'model': 'openai/gpt-oss-20b',
+              'messages': [
+                {
+                  'role': 'system',
+                  'content':
+                      'أنت خبير في التربية والتعليم والمنهاج السوري. '
+                      'أعد تحضيرًا تربويًا عمليًا ومفصلًا باللغة العربية. '
+                      'اكتب أهدافًا قابلة للقياس، وتمهيدًا، ووسائل، '
+                      'وخطوات تنفيذ واضحة للمعلم، وأنشطة، وتقويمًا، '
+                      'وفروقًا فردية، وواجبًا منزليًا. '
+                      'وزع زمن الحصة على مراحلها بما يناسب مدة الدرس. '
+                      'خصص التحضير لمحتوى الدرس الفعلي، '
+                      'وتجنب العبارات العامة المتكررة قدر الإمكان.',
+                },
+                {
+                  'role': 'user',
+                  'content':
+                      'أعد تحضير الدرس التالي وفق المنهاج السوري:\n'
+                      'المادة: $subject\n'
+                      'الصف: $grade\n'
+                      'عنوان الدرس: $lesson\n'
+                      'الوحدة أو المجال: $unit\n'
+                      'نوع الدرس: $lessonType\n'
+                      'مدة الحصة: $duration\n'
+                      'المعارف السابقة: $previous\n'
+                      'ملاحظات المعلم: $notes\n\n'
+                      'نظم الإجابة بعناوين واضحة، '
+                      'واكتب خطوات عملية يستطيع المعلم تنفيذها '
+                      'مباشرة داخل الصف، مع أسئلة وأمثلة مناسبة '
+                      'لعمر الطلاب.',
+                },
+              ],
+              'temperature': 0.4,
+            }),
+          )
+          .timeout(const Duration(seconds: 45));
 
-          final result =
-              data['choices'][0]['message']['content'] as String;
+      if (response.statusCode != 200) {
+        throw Exception('تعذر الاتصال بخدمة التحضير');
+      }
 
-          if (result.trim().isNotEmpty) {
-            if (!mounted) return;
+      final data = jsonDecode(
+        utf8.decode(response.bodyBytes),
+      );
 
-            setState(() {
-              preparedLesson = result.trim();
-            });
+      final result =
+          data['choices'][0]['message']['content'] as String;
 
-            return;
-          }
-        }
-      } catch (_) {
-        // عند فشل الاتصال نتابع إنشاء التحضير المحلي.
+      if (result.trim().isEmpty) {
+        throw Exception('لم يصل تحضير صالح');
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        preparedLesson = result.trim();
+      });
+
+      return;
+    } catch (_) {
+      // عند فشل الذكاء الاصطناعي نستخدم التحضير المحلي.
+    } finally {
+      if (mounted) {
+        setState(() {
+          isGenerating = false;
+        });
       }
     }
 
@@ -313,7 +349,8 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     buffer.writeln('خامسًا: الأنشطة الصفية');
     buffer.writeln(
       'نشاط جماعي قصير، ثم نشاط فردي يناسب مستوى الطلاب، '
-      'مع تقديم دعم إضافي لمن يحتاج إليه وتحدٍّ مناسب للطلاب المتقدمين.',
+      'مع تقديم دعم إضافي لمن يحتاج إليه وتحدٍّ مناسب '
+      'للطلاب المتقدمين.',
     );
 
     buffer.writeln();
@@ -322,14 +359,16 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     buffer.writeln('• ملاحظة أداء الطلاب خلال النشاط.');
     buffer.writeln('• مهمة قصيرة في نهاية الحصة.');
     buffer.writeln(
-      '• تسجيل الطلاب الذين أتقنوا المهارة والطلاب الذين يحتاجون إلى دعم.',
+      '• تسجيل الطلاب الذين أتقنوا المهارة '
+      'والطلاب الذين يحتاجون إلى دعم.',
     );
 
     buffer.writeln();
     buffer.writeln('سابعًا: مراعاة الفروق الفردية');
     buffer.writeln(
-      'تبسيط التعليمات وتقديم أمثلة إضافية للطلاب الذين يواجهون صعوبة، '
-      'مع تشجيع جميع الطلاب ومنحهم وقتًا كافيًا للمحاولة.',
+      'تبسيط التعليمات وتقديم أمثلة إضافية للطلاب '
+      'الذين يواجهون صعوبة، مع تشجيع الجميع '
+      'ومنحهم وقتًا كافيًا للمحاولة.',
     );
 
     buffer.writeln();
@@ -348,9 +387,11 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     buffer.writeln();
     buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
     buffer.writeln(
-      'ملاحظة: هذا نموذج أولي مقترح، '
+      'ملاحظة: هذا نموذج محلي أولي، '
       'ويجب تخصيص أهدافه وأنشطته وفق محتوى الدرس الفعلي.',
     );
+
+    if (!mounted) return;
 
     setState(() {
       preparedLesson = buffer.toString();
@@ -358,6 +399,8 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   }
 
   void clearForm() {
+    if (isGenerating) return;
+
     _formKey.currentState?.reset();
     _lessonController.clear();
     _unitController.clear();
@@ -393,6 +436,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: prepCream,
       appBar: AppBar(
         backgroundColor: prepGreen,
         foregroundColor: Colors.white,
@@ -410,7 +454,10 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             decoration: BoxDecoration(
               color: prepGreen,
               borderRadius: BorderRadius.circular(23),
-              border: Border.all(color: prepGold, width: 1.2),
+              border: Border.all(
+                color: prepGold,
+                width: 1.2,
+              ),
             ),
             child: const Column(
               children: [
@@ -443,7 +490,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             ),
           ),
           const SizedBox(height: 18),
-
           Form(
             key: _formKey,
             child: Column(
@@ -506,7 +552,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                     ),
                   ],
                 ),
-
                 formCard(
                   title: 'تنظيم الحصة',
                   icon: Icons.schedule_rounded,
@@ -558,35 +603,38 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                       hint: 'مستوى الطلاب أو صعوبات متوقعة...',
                       maxLines: 3,
                     ),
-                    const SizedBox(height: 13),
-TextFormField(
-  controller: _apiKeyController,
-  obscureText: true,
-  decoration: fieldDecoration(
-    'مفتاح Groq API',
-    hint: 'ألصق المفتاح هنا',
-    icon: Icons.key_rounded,
-  ),
-),
                   ],
                 ),
-
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: generatePreparation,
+                    onPressed:
+                        isGenerating ? null : generatePreparation,
                     style: FilledButton.styleFrom(
                       backgroundColor: prepGreen,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    icon: const Icon(Icons.auto_awesome_rounded),
-                    label: const Text(
-                      'إعداد نموذج التحضير',
-                      style: TextStyle(
+                    icon: isGenerating
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded),
+                    label: Text(
+                      isGenerating
+                          ? 'جارٍ إعداد التحضير...'
+                          : 'إعداد نموذج التحضير',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -597,23 +645,27 @@ TextFormField(
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: clearForm,
+                    onPressed:
+                        isGenerating ? null : clearForm,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: prepGreen,
                       side: const BorderSide(color: prepGold),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     icon: const Icon(Icons.restart_alt_rounded),
-                    label: const Text('مسح الحقول والبدء من جديد'),
+                    label: const Text(
+                      'مسح الحقول والبدء من جديد',
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-
           if (preparedLesson != null) ...[
             const SizedBox(height: 24),
             formCard(
@@ -636,7 +688,12 @@ TextFormField(
                     style: FilledButton.styleFrom(
                       backgroundColor: prepGreen,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                     ),
                     icon: const Icon(Icons.copy_rounded),
                     label: const Text('نسخ التحضير'),
@@ -645,17 +702,6 @@ TextFormField(
               ],
             ),
           ],
-
-          const SizedBox(height: 15),
-          const Center(
-            child: Text(
-              'سِراج .. رفيقك في التعلم',
-              style: TextStyle(
-                color: prepGreen,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
           const SizedBox(height: 20),
         ],
       ),
