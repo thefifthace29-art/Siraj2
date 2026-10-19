@@ -168,7 +168,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     );
   }
 
-  void generatePreparation() {
+  Future<void> generatePreparation() async {
     if (!_formKey.currentState!.validate()) return;
 
     final lesson = _lessonController.text.trim();
