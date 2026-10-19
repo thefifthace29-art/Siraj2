@@ -486,6 +486,16 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                       hint: 'مستوى الطلاب أو صعوبات متوقعة...',
                       maxLines: 3,
                     ),
+                    const SizedBox(height: 13),
+TextFormField(
+  controller: _apiKeyController,
+  obscureText: true,
+  decoration: fieldDecoration(
+    'مفتاح Groq API',
+    hint: 'ألصق المفتاح هنا',
+    icon: Icons.key_rounded,
+  ),
+),
                   ],
                 ),
 
