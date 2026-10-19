@@ -8,9 +8,6 @@ const Color prepGreen = Color(0xFF0A4D2E);
 const Color prepGold = Color(0xFFD4AF37);
 const Color prepCream = Color(0xFFFDFBF7);
 
-// ضع مفتاح Groq الخاص بك هنا على هاتفك فقط.
-const String groqApiKey = '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';
-
 class LessonPrepPage extends StatefulWidget {
   const LessonPrepPage({super.key});
 
