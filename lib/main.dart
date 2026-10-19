@@ -201,6 +201,17 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
+   
+    if (section == 'تحضير الدروس') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const LessonPrepPage(),
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
