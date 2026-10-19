@@ -1,0 +1,579 @@
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+const Color prepGreen = Color(0xFF0A4D2E);
+const Color prepGold = Color(0xFFD4AF37);
+const Color prepCream = Color(0xFFFDFBF7);
+
+class LessonPrepPage extends StatefulWidget {
+  const LessonPrepPage({super.key});
+
+  @override
+  State<LessonPrepPage> createState() => _LessonPrepPageState();
+}
+
+class _LessonPrepPageState extends State<LessonPrepPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _lessonController = TextEditingController();
+  final _unitController = TextEditingController();
+  final _previousController = TextEditingController();
+  final _notesController = TextEditingController();
+
+  String subject = 'العربية لغتي';
+  String grade = 'الصف الثاني الابتدائي';
+  String duration = '45 دقيقة';
+  String lessonType = 'درس جديد';
+
+  String? preparedLesson;
+
+  @override
+  void dispose() {
+    _lessonController.dispose();
+    _unitController.dispose();
+    _previousController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Widget sectionTitle(String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: prepGreen, size: 24),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: prepGreen,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration fieldDecoration(
+    String label, {
+    String? hint,
+    IconData? icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: icon == null ? null : Icon(icon, color: prepGreen),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: prepGold.withOpacity(0.6)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: prepGold.withOpacity(0.6)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: prepGreen, width: 1.5),
+      ),
+    );
+  }
+
+  Widget textField({
+    required String label,
+    required TextEditingController controller,
+    String? hint,
+    int maxLines = 1,
+    bool requiredField = false,
+    IconData? icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      textInputAction:
+          maxLines > 1 ? TextInputAction.newline : TextInputAction.next,
+      decoration: fieldDecoration(label, hint: hint, icon: icon),
+      validator: requiredField
+          ? (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'يرجى إدخال $label';
+              }
+              return null;
+            }
+          : null,
+    );
+  }
+
+  Widget dropdownField({
+    required String label,
+    required String value,
+    required List<String> options,
+    required ValueChanged<String?> onChanged,
+    IconData? icon,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      isExpanded: true,
+      decoration: fieldDecoration(label, icon: icon),
+      items: options
+          .map(
+            (item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget formCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(21),
+        border: Border.all(color: prepGold.withOpacity(0.55)),
+        boxShadow: [
+          BoxShadow(
+            color: prepGreen.withOpacity(0.035),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          sectionTitle(title, icon),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  void generatePreparation() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final lesson = _lessonController.text.trim();
+    final unit = _unitController.text.trim();
+    final previous = _previousController.text.trim();
+    final notes = _notesController.text.trim();
+
+    final buffer = StringBuffer();
+
+    buffer.writeln('تحضير درس: $lesson');
+    buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
+    buffer.writeln('المادة: $subject');
+    buffer.writeln('الصف: $grade');
+    buffer.writeln('نوع الدرس: $lessonType');
+    buffer.writeln('زمن الحصة: $duration');
+
+    if (unit.isNotEmpty) {
+      buffer.writeln('الوحدة: $unit');
+    }
+
+    buffer.writeln();
+    buffer.writeln('أولًا: الأهداف التعليمية');
+    buffer.writeln('بنهاية الحصة يُتوقع من المتعلم أن يكون قادرًا على:');
+    buffer.writeln('١. يحدد الفكرة أو المهارة الأساسية في الدرس.');
+    buffer.writeln('٢. يشارك في النشاط التعليمي المرتبط بموضوع الدرس.');
+    buffer.writeln('٣. يجيب عن أسئلة مناسبة لمستواه.');
+    buffer.writeln('٤. يطبق ما تعلمه في مهمة قصيرة.');
+
+    buffer.writeln();
+    buffer.writeln('ثانيًا: التهيئة والتمهيد');
+    buffer.writeln(
+      'يبدأ المعلم بتحية الطلاب وتهيئة بيئة صفية مشجعة، '
+      'ثم يطرح سؤالًا أو يعرض صورة مرتبطة بموضوع الدرس، '
+      'ويستمع إلى إجابات الطلاب لربط التعلم بخبراتهم السابقة.',
+    );
+
+    if (previous.isNotEmpty) {
+      buffer.writeln('مراجعة التعلم السابق: $previous');
+    }
+
+    buffer.writeln();
+    buffer.writeln('ثالثًا: الوسائل التعليمية');
+    buffer.writeln(
+      'الكتاب المدرسي، والسبورة، والبطاقات أو الصور المناسبة، '
+      'وأدوات النشاط المتاحة.',
+    );
+
+    buffer.writeln();
+    buffer.writeln('رابعًا: سير الدرس');
+    buffer.writeln('١. التمهيد واستثارة انتباه الطلاب.');
+    buffer.writeln(
+      '٢. عرض موضوع الدرس وشرح المهارة الجديدة بأمثلة واضحة.',
+    );
+    buffer.writeln(
+      '٣. تقديم نموذج عملي أمام الطلاب مع التفكير بصوت مسموع.',
+    );
+    buffer.writeln(
+      '٤. تنفيذ نشاط موجه بمشاركة الطلاب وتصحيح الأخطاء بلطف.',
+    );
+    buffer.writeln(
+      '٥. إتاحة فرصة للتطبيق الفردي ومراعاة الفروق الفردية.',
+    );
+    buffer.writeln(
+      '٦. تلخيص الأفكار الأساسية والتأكد من تحقق الأهداف.',
+    );
+
+    buffer.writeln();
+    buffer.writeln('خامسًا: الأنشطة الصفية');
+    buffer.writeln(
+      'نشاط جماعي قصير، ثم نشاط فردي يناسب مستوى الطلاب، '
+      'مع تقديم دعم إضافي لمن يحتاج إليه وتحدٍّ مناسب للطلاب المتقدمين.',
+    );
+
+    buffer.writeln();
+    buffer.writeln('سادسًا: التقويم');
+    buffer.writeln('• أسئلة شفوية أثناء الشرح.');
+    buffer.writeln('• ملاحظة أداء الطلاب خلال النشاط.');
+    buffer.writeln('• مهمة قصيرة في نهاية الحصة.');
+    buffer.writeln(
+      '• تسجيل الطلاب الذين أتقنوا المهارة والطلاب الذين يحتاجون إلى دعم.',
+    );
+
+    buffer.writeln();
+    buffer.writeln('سابعًا: مراعاة الفروق الفردية');
+    buffer.writeln(
+      'تبسيط التعليمات وتقديم أمثلة إضافية للطلاب الذين يواجهون صعوبة، '
+      'مع تشجيع جميع الطلاب ومنحهم وقتًا كافيًا للمحاولة.',
+    );
+
+    buffer.writeln();
+    buffer.writeln('ثامنًا: الواجب المنزلي');
+    buffer.writeln(
+      'تكليف قصير مرتبط بهدف الدرس، مناسب لعمر الطلاب '
+      'ووقتهم، ويعزز المهارة دون إرهاق.',
+    );
+
+    if (notes.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('ملاحظات المعلم');
+      buffer.writeln(notes);
+    }
+
+    buffer.writeln();
+    buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
+    buffer.writeln(
+      'ملاحظة: هذا نموذج أولي مقترح، '
+      'ويجب تخصيص أهدافه وأنشطته وفق محتوى الدرس الفعلي.',
+    );
+
+    setState(() {
+      preparedLesson = buffer.toString();
+    });
+  }
+
+  void clearForm() {
+    _formKey.currentState?.reset();
+    _lessonController.clear();
+    _unitController.clear();
+    _previousController.clear();
+    _notesController.clear();
+
+    setState(() {
+      subject = 'العربية لغتي';
+      grade = 'الصف الثاني الابتدائي';
+      duration = '45 دقيقة';
+      lessonType = 'درس جديد';
+      preparedLesson = null;
+    });
+  }
+
+  Future<void> copyPreparation() async {
+    if (preparedLesson == null) return;
+
+    await Clipboard.setData(
+      ClipboardData(text: preparedLesson!),
+    );
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('تم نسخ التحضير'),
+        backgroundColor: prepGreen,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: prepGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'تحضير الدروس',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: prepGreen,
+              borderRadius: BorderRadius.circular(23),
+              border: Border.all(color: prepGold, width: 1.2),
+            ),
+            child: const Column(
+              children: [
+                Icon(
+                  Icons.edit_note_rounded,
+                  color: prepGold,
+                  size: 44,
+                ),
+                SizedBox(height: 9),
+                Text(
+                  'خطط لدرس ناجح',
+                  style: TextStyle(
+                    color: prepGold,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'أدخل معلومات الدرس لإعداد نموذج تحضير '
+                  'منظم يمكنك مراجعته وتخصيصه.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    height: 1.8,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                formCard(
+                  title: 'معلومات الدرس',
+                  icon: Icons.menu_book_rounded,
+                  children: [
+                    dropdownField(
+                      label: 'المادة',
+                      value: subject,
+                      icon: Icons.school_outlined,
+                      options: const [
+                        'العربية لغتي',
+                        'الرياضيات',
+                        'التربية الإسلامية',
+                        'العلوم',
+                        'الاجتماعيات',
+                        'أخرى',
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => subject = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 13),
+                    dropdownField(
+                      label: 'الصف',
+                      value: grade,
+                      icon: Icons.groups_outlined,
+                      options: const [
+                        'الصف الأول الابتدائي',
+                        'الصف الثاني الابتدائي',
+                        'الصف الثالث الابتدائي',
+                        'الصف الرابع الابتدائي',
+                        'الصف الخامس الابتدائي',
+                        'الصف السادس الابتدائي',
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => grade = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 13),
+                    textField(
+                      label: 'عنوان الدرس',
+                      controller: _lessonController,
+                      hint: 'مثال: وطني',
+                      requiredField: true,
+                      icon: Icons.title_rounded,
+                    ),
+                    const SizedBox(height: 13),
+                    textField(
+                      label: 'الوحدة أو المجال',
+                      controller: _unitController,
+                      hint: 'اسم الوحدة إن وجد',
+                      icon: Icons.folder_outlined,
+                    ),
+                  ],
+                ),
+
+                formCard(
+                  title: 'تنظيم الحصة',
+                  icon: Icons.schedule_rounded,
+                  children: [
+                    dropdownField(
+                      label: 'نوع الدرس',
+                      value: lessonType,
+                      options: const [
+                        'درس جديد',
+                        'مراجعة وتثبيت',
+                        'تطبيق وتدريب',
+                        'تقويم',
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => lessonType = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 13),
+                    dropdownField(
+                      label: 'مدة الحصة',
+                      value: duration,
+                      options: const [
+                        '30 دقيقة',
+                        '35 دقيقة',
+                        '40 دقيقة',
+                        '45 دقيقة',
+                        '50 دقيقة',
+                        '60 دقيقة',
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => duration = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 13),
+                    textField(
+                      label: 'المعارف السابقة',
+                      controller: _previousController,
+                      hint: 'ما الذي يعرفه الطلاب مسبقًا؟',
+                      maxLines: 2,
+                    ),
+                    const SizedBox(height: 13),
+                    textField(
+                      label: 'ملاحظات المعلم',
+                      controller: _notesController,
+                      hint: 'مستوى الطلاب أو صعوبات متوقعة...',
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: generatePreparation,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: prepGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    icon: const Icon(Icons.auto_awesome_rounded),
+                    label: const Text(
+                      'إعداد نموذج التحضير',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: clearForm,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: prepGreen,
+                      side: const BorderSide(color: prepGold),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    icon: const Icon(Icons.restart_alt_rounded),
+                    label: const Text('مسح الحقول والبدء من جديد'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          if (preparedLesson != null) ...[
+            const SizedBox(height: 24),
+            formCard(
+              title: 'نموذج التحضير',
+              icon: Icons.description_outlined,
+              children: [
+                SelectableText(
+                  preparedLesson!,
+                  style: const TextStyle(
+                    color: Color(0xFF26372D),
+                    fontSize: 14,
+                    height: 1.9,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: copyPreparation,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: prepGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    icon: const Icon(Icons.copy_rounded),
+                    label: const Text('نسخ التحضير'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          const SizedBox(height: 15),
+          const Center(
+            child: Text(
+              'سِراج .. رفيقك في التعلم',
+              style: TextStyle(
+                color: prepGreen,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
