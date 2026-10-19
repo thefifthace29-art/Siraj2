@@ -117,6 +117,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     now = DateTime.now();
+
     clockTimer = Timer.periodic(
       const Duration(seconds: 30),
       (_) {
@@ -136,9 +137,11 @@ class _HomePageState extends State<HomePage> {
   String arabicDigits(String value) {
     const western = '0123456789';
     const eastern = '٠١٢٣٤٥٦٧٨٩';
+
     for (int i = 0; i < western.length; i++) {
       value = value.replaceAll(western[i], eastern[i]);
     }
+
     return value;
   }
 
@@ -158,6 +161,7 @@ class _HomePageState extends State<HomePage> {
       'السبت',
       'الأحد',
     ];
+
     const months = [
       'كانون الثاني',
       'شباط',
@@ -702,6 +706,20 @@ class ArabicPage extends StatelessWidget {
             },
           ),
           ArabicFeatureCard(
+            icon: Icons.list_alt_rounded,
+            title: 'فهرس الكتاب',
+            subtitle: 'الوحدات والدروس والانتقال المباشر إلى الصفحة',
+            color: const Color(0xFF8A6A22),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const BookIndexPage(),
+                ),
+              );
+            },
+          ),
+          ArabicFeatureCard(
             icon: Icons.edit_note_rounded,
             title: 'تحضير الدروس',
             subtitle: 'تحضير منظم مرتبط بالدروس وأهدافها',
@@ -737,6 +755,8 @@ class ArabicPage extends StatelessWidget {
     );
   }
 }
+
+// ==================== بطاقة ميزة العربية ====================
 
 class ArabicFeatureCard extends StatelessWidget {
   final IconData icon;
@@ -818,6 +838,200 @@ class ArabicFeatureCard extends StatelessWidget {
   }
 }
 
+// ==================== فهرس الكتاب التفاعلي ====================
+
+class BookIndexPage extends StatelessWidget {
+  const BookIndexPage({super.key});
+
+  static const List<Map<String, dynamic>> units = [
+    {
+      'title': 'الوحدة الأولى: المواطنة والانتماء',
+      'icon': Icons.flag_rounded,
+      'color': Color(0xFF0A4D2E),
+      'lessons': [
+        {'title': 'اليوم الأول في المدرسة', 'page': 4},
+        {'title': 'من حقي أن أتعلم', 'page': 12},
+        {'title': 'وطني', 'page': 20},
+        {'title': 'الزيتونة والريح', 'page': 27},
+      ],
+    },
+    {
+      'title': 'الوحدة الثانية: الرياضة والفنون',
+      'icon': Icons.palette_rounded,
+      'color': Color(0xFF8A6A22),
+      'lessons': [
+        {'title': 'هيا نسبح', 'page': 36},
+        {'title': 'تحدي الأذكياء', 'page': 44},
+        {'title': 'عشاق الأغاني', 'page': 51},
+        {'title': 'العالم الطبيب', 'page': 57},
+      ],
+    },
+    {
+      'title': 'الوحدة الثالثة: دنيا العلوم',
+      'icon': Icons.science_rounded,
+      'color': Color(0xFF526C83),
+      'lessons': [
+        {'title': 'جرة الفخار وجرة الحديد', 'page': 68},
+        {'title': 'رحلة الفضاء', 'page': 71},
+        {'title': 'متحف دمشق التربوي', 'page': 78},
+        {'title': 'هل تعلم؟', 'page': 85},
+      ],
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'فهرس الكتاب',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: royalGreen,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: gold, width: 1.2),
+            ),
+            child: const Column(
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  color: gold,
+                  size: 42,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'العربية لغتي',
+                  style: TextStyle(
+                    color: gold,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  'الصف الثاني الأساسي • الفصل الأول',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'اختر الوحدة، ثم اضغط على الدرس لفتحه مباشرةً.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    height: 1.7,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          for (final unit in units)
+            Card(
+              color: Colors.white,
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: (unit['color'] as Color).withOpacity(0.35),
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: ExpansionTile(
+                initiallyExpanded: true,
+                leading: Icon(
+                  unit['icon'] as IconData,
+                  color: unit['color'] as Color,
+                  size: 29,
+                ),
+                iconColor: gold,
+                collapsedIconColor: royalGreen,
+                title: Text(
+                  unit['title'] as String,
+                  style: TextStyle(
+                    color: unit['color'] as Color,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                children: [
+                  for (final lesson
+                      in unit['lessons'] as List<Map<String, dynamic>>)
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            (unit['color'] as Color).withOpacity(0.10),
+                        child: Icon(
+                          Icons.menu_book_rounded,
+                          color: unit['color'] as Color,
+                          size: 21,
+                        ),
+                      ),
+                      title: Text(
+                        lesson['title'] as String,
+                        style: const TextStyle(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'الصفحة ${lesson['page']}',
+                        style: const TextStyle(
+                          color: Color(0xFF77715F),
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: gold,
+                        size: 17,
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TextbookPage(
+                              initialPage: lesson['page'] as int,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 12),
+          const Center(
+            child: Text(
+              'سِراج .. رفيقك في التعلم',
+              style: TextStyle(
+                color: royalGreen,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
 void showComingSoon(BuildContext context, String feature) {
   showDialog<void>(
     context: context,
@@ -854,7 +1068,12 @@ void showComingSoon(BuildContext context, String feature) {
 // ==================== عارض الكتاب المدرسي ====================
 
 class TextbookPage extends StatefulWidget {
-  const TextbookPage({super.key});
+  final int initialPage;
+
+  const TextbookPage({
+    super.key,
+    this.initialPage = 1,
+  });
 
   @override
   State<TextbookPage> createState() => _TextbookPageState();
@@ -862,7 +1081,7 @@ class TextbookPage extends StatefulWidget {
 
 class _TextbookPageState extends State<TextbookPage> {
   late final PdfControllerPinch pdfController;
-  int currentPage = 1;
+  late int currentPage;
   int totalPages = 0;
   Object? loadingError;
 
@@ -870,8 +1089,11 @@ class _TextbookPageState extends State<TextbookPage> {
   void initState() {
     super.initState();
 
+    currentPage = widget.initialPage;
+
     pdfController = PdfControllerPinch(
       document: PdfDocument.openAsset('arabic_grade2_term1.pdf'),
+      initialPage: widget.initialPage,
     );
 
     pdfController.document.then((document) {
