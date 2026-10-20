@@ -419,6 +419,65 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     });
   }
 
+final List<String> _prepSections = const [
+  'مخرجات التعلم',
+  'طرائق التدريس',
+  'موارد التعلم ووسائطه',
+  'التمهيد والتهيئة',
+  'سير الدرس',
+  'إغلاق الدرس',
+  'التقويم المرحلي',
+  'التقويم النهائي',
+  'نشاط للمتميزين',
+  'نشاط للأقل تحصيلاً',
+];
+
+List<Map<String, String>> _splitPreparation(String text) {
+  final sections = <Map<String, String>>[];
+  String? currentTitle;
+  final currentContent = StringBuffer();
+
+  final headingPattern = RegExp(
+    r'^\s*(?:[١-١٠0-9]+[\.\-ـ):：、]?\s*)?'
+    r'(مخرجات التعلم|طرائق التدريس|موارد التعلم ووسائطه|'
+    r'التمهيد والتهيئة|سير الدرس|إغلاق الدرس|'
+    r'التقويم المرحلي|التقويم النهائي|'
+    r'نشاط للمتميزين|نشاط للأقل تحصيلاً)'
+    r'\s*[:：\-ـ]?\s*$',
+  );
+
+  void saveSection() {
+    if (currentTitle != null) {
+      sections.add({
+        'title': currentTitle!,
+        'content': currentContent.toString().trim(),
+      });
+    }
+  }
+
+  for (final line in text.split('\n')) {
+    final match = headingPattern.firstMatch(line);
+    if (match != null) {
+      saveSection();
+      currentTitle = match.group(1);
+      currentContent.clear();
+    } else if (currentTitle != null) {
+      currentContent.writeln(line);
+    }
+  }
+
+  saveSection();
+
+  if (sections.isEmpty) {
+    return [
+      {'title': 'التحضير الكامل', 'content': text.trim()},
+    ];
+  }
+
+  return sections;
+}
+
+ 
   Future<void> copyPreparation() async {
     if (preparedLesson == null) return;
 
@@ -675,14 +734,72 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
               title: 'نموذج التحضير',
               icon: Icons.description_outlined,
               children: [
-                SelectableText(
-                  preparedLesson!,
-                  style: const TextStyle(
-                    color: Color(0xFF26372D),
-                    fontSize: 14,
-                    height: 1.9,
-                  ),
+                
+..._splitPreparation(preparedLesson!).map((section) {
+  final index = _prepSections.indexOf(section['title']);
+
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(
+        color: prepGreen.withValues(alpha: 0.20),
+      ),
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: prepGreen.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Text(
+                index >= 0 ? '${index + 1}' : '•',
+                style: const TextStyle(
+                  color: prepGreen,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                section['title']!,
+                style: const TextStyle(
+                  color: prepGreen,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        SelectableText(
+          section['content']!.isEmpty
+              ? 'لم يُدرج محتوى لهذا القسم.'
+              : section['content']!,
+          style: const TextStyle(
+            color: Color(0xFF26372D),
+            fontSize: 14,
+            height: 1.9,
+          ),
+        ),
+      ],
+    ),
+  );
+}),
+
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
