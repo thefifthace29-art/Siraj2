@@ -13,6 +13,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   pdfx: 2.9.2
   http: ^1.2.2
+  syncfusion_flutter_pdf: ^28.2.12
 
 dev_dependencies:
   flutter_test:
