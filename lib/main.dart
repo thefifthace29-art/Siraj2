@@ -666,11 +666,7 @@ class ArabicPage extends StatelessWidget {
             ),
             child: const Column(
               children: [
-                Icon(
-                  Icons.menu_book_rounded,
-                  color: gold,
-                  size: 48,
-                ),
+                Icon(Icons.menu_book_rounded, color: gold, size: 48),
                 SizedBox(height: 10),
                 Text(
                   'العربية لغتي',
@@ -683,19 +679,13 @@ class ArabicPage extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'الصف الثاني الابتدائي',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'الكتاب هو مرجع التحضير والأنشطة والتقويم',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    height: 1.7,
-                  ),
+                  style: TextStyle(color: Colors.white, height: 1.7),
                 ),
               ],
             ),
@@ -730,17 +720,17 @@ class ArabicPage extends StatelessWidget {
             },
           ),
 
-          // تم ربط بطاقة التحضير بصفحة التحضير الفعلية.
+          // بطاقة ألعب وأتعلّم الجديدة، بدل بطاقة التحضير داخل هذا القسم.
           ArabicFeatureCard(
-            icon: Icons.edit_note_rounded,
-            title: 'تحضير الدروس',
-            subtitle: 'تحضير منظم مرتبط بالدروس وأهدافها',
-            color: const Color(0xFF526C83),
+            icon: Icons.rocket_launch_rounded,
+            title: 'ألعب وأتعلّم',
+            subtitle: 'مغامرات وألغاز وتحديات لغوية ممتعة',
+            color: const Color(0xFF8A4F91),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const LessonPrepPage(),
+                  builder: (_) => const PlayAndLearnPage(),
                 ),
               );
             },
@@ -856,6 +846,1117 @@ class ArabicFeatureCard extends StatelessWidget {
                 size: 18,
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== ألعب وأتعلّم ====================
+
+class SirajQuestion {
+  final String question;
+  final List<String> options;
+  final int correctIndex;
+  final String explanation;
+
+  const SirajQuestion({
+    required this.question,
+    required this.options,
+    required this.correctIndex,
+    required this.explanation,
+  });
+}
+
+class SirajActivity {
+  final String title;
+  final String subtitle;
+  final String description;
+  final String emoji;
+  final Color color;
+  final String skill;
+  final List<SirajQuestion> questions;
+
+  const SirajActivity({
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.emoji,
+    required this.color,
+    required this.skill,
+    required this.questions,
+  });
+}
+
+const List<SirajQuestion> arabicChallengeQuestions = [
+  SirajQuestion(
+    question: 'أي كلمة تبدأ بحرف الباء؟',
+    options: ['قَلَم', 'بَاب', 'شَمْس'],
+    correctIndex: 1,
+    explanation: 'أحسنت! كلمة «باب» تبدأ بحرف الباء.',
+  ),
+  SirajQuestion(
+    question: 'ما جمع كلمة «كتاب»؟',
+    options: ['كاتِب', 'مَكْتَب', 'كُتُب'],
+    correctIndex: 2,
+    explanation: 'صحيح! جمع كتاب هو كُتُب.',
+  ),
+  SirajQuestion(
+    question: 'أي كلمة تنتهي بحرف التاء؟',
+    options: ['بَيْت', 'باب', 'قَلَم'],
+    correctIndex: 0,
+    explanation: 'رائع! كلمة «بيت» تنتهي بحرف التاء.',
+  ),
+  SirajQuestion(
+    question: 'اختر الكلمة التي تدل على حيوان.',
+    options: ['مَدْرَسَة', 'أَسَد', 'نافِذَة'],
+    correctIndex: 1,
+    explanation: 'صحيح! الأسد حيوان.',
+  ),
+  SirajQuestion(
+    question: 'أي جملة مكتوبة بطريقة صحيحة؟',
+    options: ['ذَهَبَ الوَلَدُ', 'ذهب الولد', 'ذَهَبَ الولدُ إلى'],
+    correctIndex: 0,
+    explanation: 'أحسنت! الجملة الأولى مكتملة ومضبوطة.',
+  ),
+  SirajQuestion(
+    question: 'أي كلمة تحتوي على حرف المد «ا»؟',
+    options: ['باب', 'بِنْت', 'قِطّ'],
+    correctIndex: 0,
+    explanation: 'صحيح! في كلمة «باب» حرف مد بالألف.',
+  ),
+  SirajQuestion(
+    question: 'ما ضد كلمة «كبير»؟',
+    options: ['طويل', 'صغير', 'واسع'],
+    correctIndex: 1,
+    explanation: 'رائع! ضد كبير هو صغير.',
+  ),
+  SirajQuestion(
+    question: 'أي كلمة تبدأ بحرف الشين؟',
+    options: ['شَجَرَة', 'زَهْرَة', 'قَمَر'],
+    correctIndex: 0,
+    explanation: 'صحيح! شجرة تبدأ بحرف الشين.',
+  ),
+  SirajQuestion(
+    question: 'ما الكلمة التي تدل على مكان نتعلم فيه؟',
+    options: ['مَدْرَسَة', 'سَيّارَة', 'تُفّاحَة'],
+    correctIndex: 0,
+    explanation: 'أحسنت! المدرسة مكان للتعلم.',
+  ),
+  SirajQuestion(
+    question: 'أي كلمة تبدأ بـ«الـ» التعريف؟',
+    options: ['قَلَم', 'القَلَم', 'أَقْلام'],
+    correctIndex: 1,
+    explanation: 'صحيح! «القلم» تبدأ بأل التعريف.',
+  ),
+];
+
+class PlayAndLearnPage extends StatelessWidget {
+  const PlayAndLearnPage({super.key});
+
+  static const List<SirajActivity> activities = [
+    SirajActivity(
+      title: 'جزيرة الأسرار',
+      subtitle: 'رحلة للبحث عن الكنز',
+      description:
+          'انطلق في مغامرة بين الجزر، وافتح الطريق إلى الكنز بحل الألغاز اللغوية والإجابة عن الأسئلة.',
+      emoji: '🏝️',
+      color: Color(0xFF168C83),
+      skill: 'الفهم والمفردات',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'مدينة سِراج العجيبة',
+      subtitle: 'ابنِ مدينة بالكلمات الصحيحة',
+      description:
+          'ساعد سكان المدينة على إكمال الكلمات والجمل، واجمع النجوم لتفتح أماكن جديدة.',
+      emoji: '🏰',
+      color: Color(0xFF5576C5),
+      skill: 'القراءة وبناء الجمل',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'وكالة المحققين الصغار',
+      subtitle: 'حلّ اللغز واكتشف الدليل',
+      description:
+          'أنت محقق صغير! ابحث عن الكلمة الصحيحة، وقارن الأدلة، واكتشف الإجابة التي تحل اللغز.',
+      emoji: '🔎',
+      color: Color(0xFF8A6A22),
+      skill: 'الملاحظة والاستنتاج',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'مهمة لا ينجح فيها أحد وحده',
+      subtitle: 'التعاون سر النجاح',
+      description:
+          'تحتاج هذه المهمة إلى تبادل الأفكار ومساعدة الآخرين. ناقشوا الإجابات معًا قبل اختيارها.',
+      emoji: '🤝',
+      color: Color(0xFF39865D),
+      skill: 'التعاون والتواصل',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'مسرح الحكايات الحية',
+      subtitle: 'رتّب الأحداث واكتشف القصة',
+      description:
+          'تعرّف إلى شخصيات الحكاية، وفكّر في بداية القصة وأحداثها ونهايتها، ثم أجب عن التحديات.',
+      emoji: '🎭',
+      color: Color(0xFFAD5B7A),
+      skill: 'التعبير وفهم النص',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'مخترعو المستحيل',
+      subtitle: 'أفكار ذكية وأسئلة ممتعة',
+      description:
+          'استخدم خيالك، واختر الكلمات المناسبة، واكتشف كيف يمكن لفكرة صغيرة أن تتحول إلى اختراع.',
+      emoji: '💡',
+      color: Color(0xFFD18B27),
+      skill: 'التفكير الإبداعي',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'كرنفال سِراج',
+      subtitle: 'ألعاب لغوية متنوعة',
+      description:
+          'ادخل عالم الألعاب القصيرة، واختبر معرفتك بالحروف والكلمات والمعاني بطريقة مرحة.',
+      emoji: '🎪',
+      color: Color(0xFF9A5BC1),
+      skill: 'المراجعة العامة',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'صندوق المفاجآت',
+      subtitle: 'افتح الصندوق بالسؤال الصحيح',
+      description:
+          'كل إجابة صحيحة تقرّبك من فتح الصندوق. اقرأ السؤال بهدوء واختر إجابتك.',
+      emoji: '🎁',
+      color: Color(0xFFD15C49),
+      skill: 'المفردات والتمييز',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'الرسائل السرية',
+      subtitle: 'اكتشف الكلمة المخفية',
+      description:
+          'افكك الشفرات البسيطة، وانتبه إلى الحروف والكلمات لتصل إلى الرسالة المخفية.',
+      emoji: '✉️',
+      color: Color(0xFF467E9D),
+      skill: 'تمييز الحروف والكلمات',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'بناء المدن',
+      subtitle: 'كل إجابة تبني جزءًا جديدًا',
+      description:
+          'أجب عن الأسئلة لتضيف مباني جديدة إلى مدينتك، وتعلّم كيف تصنع الكلمات عالمًا متكاملًا.',
+      emoji: '🏗️',
+      color: Color(0xFF9B7942),
+      skill: 'القراءة والمفردات',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'مصنع الحكايات المضحكة',
+      subtitle: 'كلمات تصنع حكاية طريفة',
+      description:
+          'اختر الإجابات، وتخيّل كيف تتكوّن الحكايات من كلمات وشخصيات وأحداث غير متوقعة.',
+      emoji: '🤹',
+      color: Color(0xFFDB7B37),
+      skill: 'اللغة والخيال',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'تحديات الفرق',
+      subtitle: 'تحدّوا بعضكم بروح رياضية',
+      description:
+          'يمكن للمعلم تقسيم الطلاب إلى فرق، وقراءة السؤال للجميع، ثم مناقشة الإجابات والتعلّم من الأخطاء.',
+      emoji: '🏆',
+      color: Color(0xFF357C68),
+      skill: 'التعاون والمراجعة',
+      questions: arabicChallengeQuestions,
+    ),
+    SirajActivity(
+      title: 'النهايات المتعددة',
+      subtitle: 'اختر، وفكّر، واكتشف',
+      description:
+          'تخيّل أكثر من نهاية للقصة، ثم اختبر فهمك للكلمات والجمل من خلال مجموعة من الأسئلة.',
+      emoji: '🌈',
+      color: Color(0xFF7868B5),
+      skill: 'الفهم والتفكير',
+      questions: arabicChallengeQuestions,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'ألعب وأتعلّم',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF0A4D2E), Color(0xFF287B55)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: gold, width: 1.2),
+            ),
+            child: const Column(
+              children: [
+                Text('🎮', style: TextStyle(fontSize: 48)),
+                SizedBox(height: 8),
+                Text(
+                  'مرحبًا بك في عالم سِراج!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: gold,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'تعلّم، واكتشف، وحلّ الألغاز، واجمع النجوم. كل محاولة فرصة جديدة للنجاح!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.9,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              const Icon(
+                Icons.explore_rounded,
+                color: royalGreen,
+                size: 27,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'اختر مغامرتك',
+                  style: TextStyle(
+                    color: royalGreen,
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF2CC),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  '١٣ نشاطًا',
+                  style: TextStyle(
+                    color: royalGreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'اختر بطاقة لقراءة المهمة ثم ابدأ التحدي.',
+            style: TextStyle(
+              color: Color(0xFF6B746D),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 14),
+          for (final activity in activities)
+            ActivityCard(
+              activity: activity,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => GameIntroPage(activity: activity),
+                  ),
+                );
+              },
+            ),
+          const SizedBox(height: 12),
+          const Center(
+            child: Text(
+              'سِراج .. رفيقك في التعلم',
+              style: TextStyle(
+                color: royalGreen,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== بطاقة النشاط ====================
+
+class ActivityCard extends StatelessWidget {
+  final SirajActivity activity;
+  final VoidCallback onTap;
+
+  const ActivityCard({
+    super.key,
+    required this.activity,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.white,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: activity.color.withOpacity(0.35)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                width: 62,
+                height: 62,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: activity.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Text(
+                  activity.emoji,
+                  style: const TextStyle(fontSize: 34),
+                ),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activity.title,
+                      style: TextStyle(
+                        color: activity.color,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      activity.subtitle,
+                      style: const TextStyle(
+                        color: textColor,
+                        fontSize: 12,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'المهارة: ${activity.skill}',
+                      style: const TextStyle(
+                        color: Color(0xFF77715F),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 5),
+              Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: activity.color,
+                size: 17,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== مقدمة المغامرة ====================
+
+class GameIntroPage extends StatelessWidget {
+  final SirajActivity activity;
+
+  const GameIntroPage({
+    super.key,
+    required this.activity,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: activity.color,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          activity.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: activity.color.withOpacity(0.10),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: activity.color.withOpacity(0.35),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  activity.emoji,
+                  style: const TextStyle(fontSize: 76),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  activity.title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: activity.color,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  activity.subtitle,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 15,
+                    height: 1.7,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+          const Text(
+            'مهمتك',
+            style: TextStyle(
+              color: royalGreen,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            activity.description,
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 16,
+              height: 1.9,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF9E8),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: gold.withOpacity(0.7)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.lightbulb_outline_rounded,
+                  color: royalGreen,
+                  size: 27,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'ستجيب عن ${activity.questions.length} أسئلة لغوية. '
+                    'اقرأ كل سؤال جيدًا، واختر الإجابة، وتعلّم من التفسير الذي يظهر بعد اختيارك.',
+                    style: const TextStyle(
+                      color: textColor,
+                      fontSize: 14,
+                      height: 1.8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: activity.color,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => LearningQuizPage(activity: activity),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.play_arrow_rounded, size: 28),
+              label: const Text(
+                'ابدأ التحدي',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: royalGreen,
+              side: const BorderSide(color: royalGreen),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_forward_rounded),
+            label: const Text('العودة إلى الأنشطة'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== التحدي التعليمي ====================
+
+class LearningQuizPage extends StatefulWidget {
+  final SirajActivity activity;
+
+  const LearningQuizPage({
+    super.key,
+    required this.activity,
+  });
+
+  @override
+  State<LearningQuizPage> createState() => _LearningQuizPageState();
+}
+
+class _LearningQuizPageState extends State<LearningQuizPage> {
+  int questionIndex = 0;
+  int score = 0;
+  int? selectedIndex;
+  bool answered = false;
+
+  SirajQuestion get currentQuestion =>
+      widget.activity.questions[questionIndex];
+
+  bool get isLastQuestion =>
+      questionIndex == widget.activity.questions.length - 1;
+
+  void chooseAnswer(int index) {
+    if (answered) return;
+
+    setState(() {
+      selectedIndex = index;
+      answered = true;
+
+      if (index == currentQuestion.correctIndex) {
+        score++;
+      }
+    });
+  }
+
+  void nextQuestion() {
+    if (!answered) return;
+
+    if (isLastQuestion) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => QuizResultPage(
+            activity: widget.activity,
+            score: score,
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      questionIndex++;
+      selectedIndex = null;
+      answered = false;
+    });
+  }
+
+  Color optionColor(int index) {
+    if (!answered) return Colors.white;
+
+    if (index == currentQuestion.correctIndex) {
+      return const Color(0xFFE2F4E8);
+    }
+
+    if (index == selectedIndex) {
+      return const Color(0xFFFFE8E5);
+    }
+
+    return Colors.white;
+  }
+
+  Color optionBorderColor(int index) {
+    if (!answered) return const Color(0xFFE2DCCB);
+
+    if (index == currentQuestion.correctIndex) {
+      return const Color(0xFF39865D);
+    }
+
+    if (index == selectedIndex) {
+      return Colors.redAccent;
+    }
+
+    return const Color(0xFFE2DCCB);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress =
+        (questionIndex + 1) / widget.activity.questions.length;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: widget.activity.color,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          widget.activity.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 10,
+                      backgroundColor: const Color(0xFFE7E1D5),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        widget.activity.color,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '${questionIndex + 1} / ${widget.activity.questions.length}',
+                  style: TextStyle(
+                    color: widget.activity.color,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 22),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: widget.activity.color.withOpacity(0.09),
+                borderRadius: BorderRadius.circular(23),
+                border: Border.all(
+                  color: widget.activity.color.withOpacity(0.25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    widget.activity.emoji,
+                    style: const TextStyle(fontSize: 45),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    currentQuestion.question,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: royalGreen,
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold,
+                      height: 1.7,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            for (int i = 0; i < currentQuestion.options.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Material(
+                  color: optionColor(i),
+                  borderRadius: BorderRadius.circular(17),
+                  child: InkWell(
+                    onTap: () => chooseAnswer(i),
+                    borderRadius: BorderRadius.circular(17),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 17,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(17),
+                        border: Border.all(
+                          color: optionBorderColor(i),
+                          width: 1.4,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 17,
+                            backgroundColor:
+                                widget.activity.color.withOpacity(0.12),
+                            child: Text(
+                              ['أ', 'ب', 'ج'][i],
+                              style: TextStyle(
+                                color: widget.activity.color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              currentQuestion.options[i],
+                              style: const TextStyle(
+                                color: textColor,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          if (answered &&
+                              i == currentQuestion.correctIndex)
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xFF39865D),
+                            ),
+                          if (answered &&
+                              i == selectedIndex &&
+                              i != currentQuestion.correctIndex)
+                            const Icon(
+                              Icons.cancel_rounded,
+                              color: Colors.redAccent,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (answered) ...[
+              const SizedBox(height: 5),
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: selectedIndex == currentQuestion.correctIndex
+                      ? const Color(0xFFE2F4E8)
+                      : const Color(0xFFFFF0E7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      selectedIndex == currentQuestion.correctIndex
+                          ? Icons.celebration_rounded
+                          : Icons.menu_book_rounded,
+                      color: selectedIndex == currentQuestion.correctIndex
+                          ? const Color(0xFF39865D)
+                          : const Color(0xFFAD5B32),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        currentQuestion.explanation,
+                        style: const TextStyle(
+                          color: textColor,
+                          height: 1.8,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: widget.activity.color,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onPressed: nextQuestion,
+                  icon: Icon(
+                    isLastQuestion
+                        ? Icons.emoji_events_rounded
+                        : Icons.arrow_back_rounded,
+                  ),
+                  label: Text(
+                    isLastQuestion ? 'عرض النتيجة' : 'السؤال التالي',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==================== نتيجة التحدي ====================
+
+class QuizResultPage extends StatelessWidget {
+  final SirajActivity activity;
+  final int score;
+
+  const QuizResultPage({
+    super.key,
+    required this.activity,
+    required this.score,
+  });
+
+  String get resultTitle {
+    if (score == activity.questions.length) {
+      return 'إنجاز رائع!';
+    }
+    if (score >= 3) {
+      return 'أحسنت، واصل التقدم!';
+    }
+    return 'محاولة جيدة، لنجرّب مرة أخرى!';
+  }
+
+  String get resultMessage {
+    if (score == activity.questions.length) {
+      return 'أجبت عن جميع الأسئلة إجابة صحيحة. أنت نجم سِراج اليوم!';
+    }
+    if (score >= 3) {
+      return 'حققت نتيجة جميلة. راجع الأسئلة التي أخطأت فيها وحاول تحسين نتيجتك.';
+    }
+    return 'كل محاولة تعلّم جديد. أعد التحدي، واقرأ التفسيرات بهدوء.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final total = activity.questions.length;
+    final percentage = score / total;
+    final stars = percentage >= 0.8
+        ? '⭐⭐⭐'
+        : percentage >= 0.5
+            ? '⭐⭐'
+            : '⭐';
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: activity.color,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text(
+          'نتيجتك',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              children: [
+                Text(
+                  activity.emoji,
+                  style: const TextStyle(fontSize: 66),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'انتهى التحدي!',
+                  style: TextStyle(
+                    color: royalGreen,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  width: 175,
+                  height: 175,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: activity.color.withOpacity(0.10),
+                    border: Border.all(
+                      color: activity.color,
+                      width: 4,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$score / $total',
+                        style: TextStyle(
+                          color: activity.color,
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        'الإجابات الصحيحة',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  stars,
+                  style: const TextStyle(fontSize: 32),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  resultTitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: activity.color,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  resultMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: textColor,
+                    fontSize: 15,
+                    height: 1.9,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: activity.color,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              LearningQuizPage(activity: activity),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text(
+                      'إعادة التحدي',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: royalGreen,
+                      side: const BorderSide(color: royalGreen),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.popUntil(
+                        context,
+                        (route) =>
+                            route.settings.name == '/' ||
+                            route.isFirst,
+                      );
+                    },
+                    icon: const Icon(Icons.home_rounded),
+                    label: const Text('العودة إلى الصفحة الرئيسية'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1021,8 +2122,6 @@ class BookIndexPage extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-
-                      // زر التحضير الجديد بجانب كل درس.
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1061,8 +2160,6 @@ class BookIndexPage extends StatelessWidget {
                           ),
                         ],
                       ),
-
-                      // الضغط على اسم الدرس يبقي فتح الكتاب كما كان.
                       onTap: () {
                         Navigator.push(
                           context,
