@@ -275,9 +275,20 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
         preparedLesson = result.trim();
       });
 
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تعذر إنشاء التحضير: $error'),
+          duration: const Duration(seconds: 8),
+        ),
+      );
+
       return;
-    } catch (_) {
-      // عند فشل الذكاء الاصطناعي نستخدم التحضير المحلي.
+    } finally {
+      
+      return;
     } finally {
       if (mounted) {
         setState(() {
