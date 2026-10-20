@@ -281,15 +281,18 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تعذر إنشاء التحضير: $error'),
-          duration: const Duration(seconds: 8),
+                    duration: const Duration(seconds: 8),
         ),
       );
 
       return;
     } finally {
-      
-      return;
-    } finally {
+      if (mounted) {
+        setState(() {
+          isGenerating = false;
+        });
+      }
+    }
       if (mounted) {
         setState(() {
           isGenerating = false;
