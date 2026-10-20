@@ -242,10 +242,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             }),
           )
           .timeout(const Duration(seconds: 45));
-
-    
-          .timeout(const Duration(seconds: 45));
-
       if (response.statusCode != 200) {
         throw Exception('تعذر الاتصال بخدمة التحضير');
       }
