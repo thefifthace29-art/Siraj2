@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,16 @@ const Color prepGold = Color(0xFFD4AF37);
 const Color prepCream = Color(0xFFFDFBF7);
 
 class LessonPrepPage extends StatefulWidget {
-  const LessonPrepPage({super.key});
+  const LessonPrepPage({
+    super.key,
+    this.initialLessonTitle,
+    this.initialUnitTitle,
+    this.initialPage,
+  });
+
+  final String? initialLessonTitle;
+  final String? initialUnitTitle;
+  final int? initialPage;
 
   @override
   State<LessonPrepPage> createState() => _LessonPrepPageState();
@@ -29,6 +39,27 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
 
   String? preparedLesson;
   bool isGenerating = false;
+
+  static const List<String> _prepSections = [
+    'مخرجات التعلم',
+    'طرائق التدريس',
+    'موارد التعلم ووسائطه',
+    'التمهيد والتهيئة',
+    'سير الدرس',
+    'إغلاق الدرس',
+    'التقويم المرحلي',
+    'التقويم النهائي',
+    'نشاط للمتميزين',
+    'نشاط للأقل تحصيلاً',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _lessonController.text = widget.initialLessonTitle ?? '';
+    _unitController.text = widget.initialUnitTitle ?? '';
+  }
 
   @override
   void dispose() {
@@ -69,8 +100,9 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon:
-          icon == null ? null : Icon(icon, color: prepGreen),
+      prefixIcon: icon == null
+          ? null
+          : Icon(icon, color: prepGreen),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
@@ -199,6 +231,10 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     });
 
     try {
+      final textbookPageText = widget.initialPage == null
+          ? ''
+          : '\nرقم صفحة الدرس في الكتاب: ${widget.initialPage}';
+
       final response = await http
           .post(
             Uri.parse(
@@ -209,30 +245,35 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             },
             body: jsonEncode({
               'messages': [
-  {
-    'role': 'system',
-  'content':
-      'أنت خبير في إعداد الدروس وفق المنهاج السوري. '
-      'أعد تحضير الدرس باللغة العربية بطريقة تربوية عملية ومفصلة. '
-      'التزم حصراً بالأقسام العشرة التالية وبالترتيب نفسه، '
-      'ولا تضف أي قسم آخر إلى نموذج التحضير: '
-      '1. مخرجات التعلم '
-      '2. طرائق التدريس '
-      '3. موارد التعلم ووسائطه '
-      '4. التمهيد والتهيئة '
-      '5. سير الدرس '
-      '6. إغلاق الدرس '
-      '7. التقويم المرحلي '
-      '8. التقويم النهائي '
-      '9. نشاط للمتميزين '
-      '10. نشاط للأقل تحصيلاً. '
-      'اجعل مخرجات التعلم قابلة للملاحظة والقياس. '
-      'فصّل سير الدرس إلى خطوات توضح دور المعلم والمتعلم، '
-      'ووزع الزمن بما يناسب مدة الحصة. '
-      'اجعل التقويم المرحلي أثناء سير الدرس والتقويم النهائي في نهايته. '
-      'قدم نشاطاً للمتميزين وآخر للطلاب الأقل تحصيلاً. '
-      'لا تحذف أي عنوان ولا تضف أقساماً أخرى.',
-},
+                {
+                  'role': 'system',
+                  'content':
+                      'أنت خبير في إعداد الدروس وفق المنهاج السوري. '
+                      'أعد تحضير الدرس باللغة العربية الفصحى، '
+                      'بطريقة تربوية عملية ومفصلة وقابلة للتطبيق. '
+                      'التزم بالعناوين العشرة التالية وبالترتيب نفسه، '
+                      'واكتب كل عنوان في سطر مستقل: '
+                      'مخرجات التعلم، طرائق التدريس، '
+                      'موارد التعلم ووسائطه، التمهيد والتهيئة، '
+                      'سير الدرس، إغلاق الدرس، التقويم المرحلي، '
+                      'التقويم النهائي، نشاط للمتميزين، '
+                      'نشاط للأقل تحصيلاً. '
+                      'لا تضف عنواناً رئيسياً آخر ولا تحذف أي عنوان. '
+                      'اجعل مخرجات التعلم قابلة للملاحظة والقياس. '
+                      'فصّل سير الدرس إلى خطوات مرقمة، '
+                      'ووضح في كل خطوة دور المعلم ودور المتعلم '
+                      'والزمن والأسئلة المتوقعة وإجاباتها. '
+                      'وزع زمن جميع خطوات الحصة بحيث يساوي مدة الحصة '
+                      'المحددة. '
+                      'اجعل التقويم المرحلي أثناء سير الدرس، '
+                      'والتقويم النهائي في نهاية الحصة. '
+                      'قدم نشاطاً إثرائياً للمتميزين ونشاطاً مبسطاً '
+                      'للطلاب الذين يحتاجون إلى دعم. '
+                      'لا تدّع الاطلاع على نص الكتاب إذا لم يُقدّم لك. '
+                      'إذا لم تتوفر تفاصيل محتوى الدرس، فاجعل التحضير '
+                      'مبنياً على عنوان الدرس، وتجنب اختلاق نصوص '
+                      'أو معلومات محددة ونسبتها إلى الكتاب.',
+                },
                 {
                   'role': 'user',
                   'content':
@@ -241,32 +282,55 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                       'الصف: $grade\n'
                       'عنوان الدرس: $lesson\n'
                       'الوحدة أو المجال: $unit\n'
+                      '$textbookPageText\n'
                       'نوع الدرس: $lessonType\n'
                       'مدة الحصة: $duration\n'
                       'المعارف السابقة: $previous\n'
                       'ملاحظات المعلم: $notes\n\n'
-                      'نظم الإجابة بعناوين واضحة، '
-                      'واكتب خطوات عملية يستطيع المعلم تنفيذها '
-                      'مباشرة داخل الصف، مع أسئلة وأمثلة مناسبة '
-                      'لعمر الطلاب.',
+                      'اكتب محتوى عملياً ومفصلاً يستطيع المعلم '
+                      'تنفيذه مباشرة داخل الصف، مع مراعاة عمر الطلاب '
+                      'والفروق الفردية. '
+                      'اكتب العناوين العشرة المطلوبة كما هي تماماً، '
+                      'واجعل لكل عنوان محتوى واضحاً ومفيداً.',
                 },
               ],
             }),
           )
           .timeout(const Duration(seconds: 45));
+
       if (response.statusCode != 200) {
-        throw Exception('تعذر الاتصال بخدمة التحضير');
+        throw Exception(
+          'تعذر الاتصال بخدمة التحضير '
+          '(رمز الاستجابة: ${response.statusCode})',
+        );
       }
 
-      final data = jsonDecode(
+      final decoded = jsonDecode(
         utf8.decode(response.bodyBytes),
       );
 
-      final result =
-          data['choices'][0]['message']['content'] as String;
+      if (decoded is! Map<String, dynamic>) {
+        throw Exception('صيغة الاستجابة غير صالحة');
+      }
 
-      if (result.trim().isEmpty) {
-        throw Exception('لم يصل تحضير صالح');
+      final choices = decoded['choices'];
+      if (choices is! List || choices.isEmpty) {
+        throw Exception('لم تصل نتيجة من خدمة التحضير');
+      }
+
+      final firstChoice = choices.first;
+      if (firstChoice is! Map) {
+        throw Exception('صيغة نتيجة التحضير غير صالحة');
+      }
+
+      final message = firstChoice['message'];
+      if (message is! Map) {
+        throw Exception('لم يصل محتوى التحضير');
+      }
+
+      final result = message['content'];
+      if (result is! String || result.trim().isEmpty) {
+        throw Exception('وصل محتوى فارغ من خدمة التحضير');
       }
 
       if (!mounted) return;
@@ -274,18 +338,15 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       setState(() {
         preparedLesson = result.trim();
       });
-
     } catch (error) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تعذر إنشاء التحضير: $error'),
-                    duration: const Duration(seconds: 8),
+          duration: const Duration(seconds: 8),
         ),
       );
-
-      return;
     } finally {
       if (mounted) {
         setState(() {
@@ -293,124 +354,15 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
         });
       }
     }
-          final buffer = StringBuffer();
-
-    buffer.writeln('تحضير درس: $lesson');
-    buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
-    buffer.writeln('المادة: $subject');
-    buffer.writeln('الصف: $grade');
-    buffer.writeln('نوع الدرس: $lessonType');
-    buffer.writeln('زمن الحصة: $duration');
-
-    if (unit.isNotEmpty) {
-      buffer.writeln('الوحدة: $unit');
-    }
-
-    buffer.writeln();
-    buffer.writeln('أولًا: الأهداف التعليمية');
-    buffer.writeln('بنهاية الحصة يُتوقع من المتعلم أن يكون قادرًا على:');
-    buffer.writeln('١. يحدد الفكرة أو المهارة الأساسية في الدرس.');
-    buffer.writeln('٢. يشارك في النشاط التعليمي المرتبط بموضوع الدرس.');
-    buffer.writeln('٣. يجيب عن أسئلة مناسبة لمستواه.');
-    buffer.writeln('٤. يطبق ما تعلمه في مهمة قصيرة.');
-
-    buffer.writeln();
-    buffer.writeln('ثانيًا: التهيئة والتمهيد');
-    buffer.writeln(
-      'يبدأ المعلم بتحية الطلاب وتهيئة بيئة صفية مشجعة، '
-      'ثم يطرح سؤالًا أو يعرض صورة مرتبطة بموضوع الدرس، '
-      'ويستمع إلى إجابات الطلاب لربط التعلم بخبراتهم السابقة.',
-    );
-
-    if (previous.isNotEmpty) {
-      buffer.writeln('مراجعة التعلم السابق: $previous');
-    }
-
-    buffer.writeln();
-    buffer.writeln('ثالثًا: الوسائل التعليمية');
-    buffer.writeln(
-      'الكتاب المدرسي، والسبورة، والبطاقات أو الصور المناسبة، '
-      'وأدوات النشاط المتاحة.',
-    );
-
-    buffer.writeln();
-    buffer.writeln('رابعًا: سير الدرس');
-    buffer.writeln('١. التمهيد واستثارة انتباه الطلاب.');
-    buffer.writeln(
-      '٢. عرض موضوع الدرس وشرح المهارة الجديدة بأمثلة واضحة.',
-    );
-    buffer.writeln(
-      '٣. تقديم نموذج عملي أمام الطلاب مع التفكير بصوت مسموع.',
-    );
-    buffer.writeln(
-      '٤. تنفيذ نشاط موجه بمشاركة الطلاب وتصحيح الأخطاء بلطف.',
-    );
-    buffer.writeln(
-      '٥. إتاحة فرصة للتطبيق الفردي ومراعاة الفروق الفردية.',
-    );
-    buffer.writeln(
-      '٦. تلخيص الأفكار الأساسية والتأكد من تحقق الأهداف.',
-    );
-
-    buffer.writeln();
-    buffer.writeln('خامسًا: الأنشطة الصفية');
-    buffer.writeln(
-      'نشاط جماعي قصير، ثم نشاط فردي يناسب مستوى الطلاب، '
-      'مع تقديم دعم إضافي لمن يحتاج إليه وتحدٍّ مناسب '
-      'للطلاب المتقدمين.',
-    );
-
-    buffer.writeln();
-    buffer.writeln('سادسًا: التقويم');
-    buffer.writeln('• أسئلة شفوية أثناء الشرح.');
-    buffer.writeln('• ملاحظة أداء الطلاب خلال النشاط.');
-    buffer.writeln('• مهمة قصيرة في نهاية الحصة.');
-    buffer.writeln(
-      '• تسجيل الطلاب الذين أتقنوا المهارة '
-      'والطلاب الذين يحتاجون إلى دعم.',
-    );
-
-    buffer.writeln();
-    buffer.writeln('سابعًا: مراعاة الفروق الفردية');
-    buffer.writeln(
-      'تبسيط التعليمات وتقديم أمثلة إضافية للطلاب '
-      'الذين يواجهون صعوبة، مع تشجيع الجميع '
-      'ومنحهم وقتًا كافيًا للمحاولة.',
-    );
-
-    buffer.writeln();
-    buffer.writeln('ثامنًا: الواجب المنزلي');
-    buffer.writeln(
-      'تكليف قصير مرتبط بهدف الدرس، مناسب لعمر الطلاب '
-      'ووقتهم، ويعزز المهارة دون إرهاق.',
-    );
-
-    if (notes.isNotEmpty) {
-      buffer.writeln();
-      buffer.writeln('ملاحظات المعلم');
-      buffer.writeln(notes);
-    }
-
-    buffer.writeln();
-    buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
-    buffer.writeln(
-      'ملاحظة: هذا نموذج محلي أولي، '
-      'ويجب تخصيص أهدافه وأنشطته وفق محتوى الدرس الفعلي.',
-    );
-
-    if (!mounted) return;
-
-    setState(() {
-      preparedLesson = buffer.toString();
-    });
   }
 
   void clearForm() {
     if (isGenerating) return;
 
     _formKey.currentState?.reset();
-    _lessonController.clear();
-    _unitController.clear();
+
+    _lessonController.text = widget.initialLessonTitle ?? '';
+    _unitController.text = widget.initialUnitTitle ?? '';
     _previousController.clear();
     _notesController.clear();
 
@@ -423,65 +375,128 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     });
   }
 
-final List<String> _prepSections = const [
-  'مخرجات التعلم',
-  'طرائق التدريس',
-  'موارد التعلم ووسائطه',
-  'التمهيد والتهيئة',
-  'سير الدرس',
-  'إغلاق الدرس',
-  'التقويم المرحلي',
-  'التقويم النهائي',
-  'نشاط للمتميزين',
-  'نشاط للأقل تحصيلاً',
-];
+  String _normalizeHeading(String value) {
+    return value
+        .replaceAll('**', '')
+        .replaceAll('__', '')
+        .replaceAll('*', '')
+        .replaceAll('#', '')
+        .replaceAll(RegExp(r'^[\s\d٠-٩١-٩.،:：؛\-ـ)（(]+'), '')
+        .replaceAll(RegExp(r'[:：\-ـ]+$'), '')
+        .trim();
+  }
 
-List<Map<String, String>> _splitPreparation(String text) {
-  final sections = <Map<String, String>>[];
-  String? currentTitle;
-  final currentContent = StringBuffer();
+  List<Map<String, String>> _splitPreparation(String text) {
+    final sections = <Map<String, String>>[];
+    String? currentTitle;
+    final currentContent = StringBuffer();
 
-  final headingPattern = RegExp(
-    r'^\s*(?:[١-١٠0-9]+[\.\-ـ):：、]?\s*)?'
-    r'(مخرجات التعلم|طرائق التدريس|موارد التعلم ووسائطه|'
-    r'التمهيد والتهيئة|سير الدرس|إغلاق الدرس|'
-    r'التقويم المرحلي|التقويم النهائي|'
-    r'نشاط للمتميزين|نشاط للأقل تحصيلاً)'
-    r'\s*[:：\-ـ]?\s*$',
-  );
+    final aliases = <String, String>{
+      'مخرجات التعلم': 'مخرجات التعلم',
+      'الأهداف التعليمية': 'مخرجات التعلم',
+      'اهداف التعلم': 'مخرجات التعلم',
+      'طرائق التدريس': 'طرائق التدريس',
+      'استراتيجيات التدريس': 'طرائق التدريس',
+      'طرق التدريس': 'طرائق التدريس',
+      'موارد التعلم ووسائطه': 'موارد التعلم ووسائطه',
+      'الوسائل التعليمية': 'موارد التعلم ووسائطه',
+      'موارد التعلم': 'موارد التعلم ووسائطه',
+      'التمهيد والتهيئة': 'التمهيد والتهيئة',
+      'التهيئة والتمهيد': 'التمهيد والتهيئة',
+      'التمهيد': 'التمهيد والتهيئة',
+      'سير الدرس': 'سير الدرس',
+      'خطوات الدرس': 'سير الدرس',
+      'إغلاق الدرس': 'إغلاق الدرس',
+      'اغلاق الدرس': 'إغلاق الدرس',
+      'الخاتمة': 'إغلاق الدرس',
+      'التقويم المرحلي': 'التقويم المرحلي',
+      'التقويم التكويني': 'التقويم المرحلي',
+      'التقويم أثناء الدرس': 'التقويم المرحلي',
+      'التقويم النهائي': 'التقويم النهائي',
+      'التقويم الختامي': 'التقويم النهائي',
+      'نشاط للمتميزين': 'نشاط للمتميزين',
+      'نشاط للمتفوقين': 'نشاط للمتميزين',
+      'نشاط الإثراء': 'نشاط للمتميزين',
+      'نشاط للأقل تحصيلاً': 'نشاط للأقل تحصيلاً',
+      'نشاط للاقل تحصيلا': 'نشاط للأقل تحصيلاً',
+      'نشاط للطلاب الضعاف': 'نشاط للأقل تحصيلاً',
+      'نشاط علاجي': 'نشاط للأقل تحصيلاً',
+    };
 
-  void saveSection() {
-    if (currentTitle != null) {
-      sections.add({
-        'title': currentTitle!,
-        'content': currentContent.toString().trim(),
-      });
+    String? matchHeading(String line) {
+      var cleaned = _normalizeHeading(line);
+
+      // تجاهل الترقيم في بداية العنوان.
+      cleaned = cleaned.replaceFirst(
+        RegExp(r'^[٠-٩١-٩0-9]+[\s.)،:\-ـ]+'),
+        '',
+      );
+
+      cleaned = cleaned.trim();
+
+      for (final entry in aliases.entries) {
+        if (cleaned == entry.key) {
+          return entry.value;
+        }
+      }
+
+      return null;
     }
-  }
 
-  for (final line in text.split('\n')) {
-    final match = headingPattern.firstMatch(line);
-    if (match != null) {
-      saveSection();
-      currentTitle = match.group(1);
-      currentContent.clear();
-    } else if (currentTitle != null) {
-      currentContent.writeln(line);
+    void saveSection() {
+      if (currentTitle != null) {
+        sections.add({
+          'title': currentTitle!,
+          'content': currentContent.toString().trim(),
+        });
+      }
     }
+
+    for (final line in text.split('\n')) {
+      final heading = matchHeading(line);
+
+      if (heading != null) {
+        saveSection();
+        currentTitle = heading;
+        currentContent.clear();
+      } else if (currentTitle != null) {
+        currentContent.writeln(line);
+      }
+    }
+
+    saveSection();
+
+    if (sections.isEmpty) {
+      return [
+        {
+          'title': 'التحضير الكامل',
+          'content': text.trim(),
+        },
+      ];
+    }
+
+    // عرض الأقسام وفق الترتيب المعتمد، حتى لو اختلف ترتيب
+    // العناوين في استجابة خدمة التحضير.
+    final orderedSections = <Map<String, String>>[];
+
+    for (final title in _prepSections) {
+      for (final section in sections) {
+        if (section['title'] == title) {
+          orderedSections.add(section);
+        }
+      }
+    }
+
+    // لا نفقد أي محتوى لم يتعرف المحلل على عنوانه.
+    for (final section in sections) {
+      if (!_prepSections.contains(section['title'])) {
+        orderedSections.add(section);
+      }
+    }
+
+    return orderedSections;
   }
 
-  saveSection();
-
-  if (sections.isEmpty) {
-    return [
-      {'title': 'التحضير الكامل', 'content': text.trim()},
-    ];
-  }
-
-  return sections;
-}
-
- 
   Future<void> copyPreparation() async {
     if (preparedLesson == null) return;
 
@@ -495,6 +510,75 @@ List<Map<String, String>> _splitPreparation(String text) {
       const SnackBar(
         content: Text('تم نسخ التحضير'),
         backgroundColor: prepGreen,
+      ),
+    );
+  }
+
+  Widget _buildPreparationSection(
+    Map<String, String> section,
+  ) {
+    final title = section['title'] ?? 'قسم التحضير';
+    final content = section['content'] ?? '';
+    final index = _prepSections.indexOf(title);
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: prepGreen.withOpacity(0.20),
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: prepGreen.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Text(
+                  index >= 0 ? '${index + 1}' : '•',
+                  style: const TextStyle(
+                    color: prepGreen,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: prepGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SelectableText(
+            content.isEmpty
+                ? 'لم يُدرج محتوى لهذا القسم.'
+                : content,
+            style: const TextStyle(
+              color: Color(0xFF26372D),
+              fontSize: 14,
+              height: 1.9,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -525,15 +609,15 @@ List<Map<String, String>> _splitPreparation(String text) {
                 width: 1.2,
               ),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.edit_note_rounded,
                   color: prepGold,
                   size: 44,
                 ),
-                SizedBox(height: 9),
-                Text(
+                const SizedBox(height: 9),
+                const Text(
                   'خطط لدرس ناجح',
                   style: TextStyle(
                     color: prepGold,
@@ -541,8 +625,8 @@ List<Map<String, String>> _splitPreparation(String text) {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: 8),
+                const Text(
                   'أدخل معلومات الدرس لإعداد نموذج تحضير '
                   'منظم يمكنك مراجعته وتخصيصه.',
                   textAlign: TextAlign.center,
@@ -552,6 +636,16 @@ List<Map<String, String>> _splitPreparation(String text) {
                     fontSize: 14,
                   ),
                 ),
+                if (widget.initialPage != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'صفحة الدرس في الكتاب: ${widget.initialPage}',
+                    style: const TextStyle(
+                      color: prepGold,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -680,7 +774,7 @@ List<Map<String, String>> _splitPreparation(String text) {
                       backgroundColor: prepGreen,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        vertical: 16,
+                        vertical: 14,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -711,8 +805,7 @@ List<Map<String, String>> _splitPreparation(String text) {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed:
-                        isGenerating ? null : clearForm,
+                    onPressed: isGenerating ? null : clearForm,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: prepGreen,
                       side: const BorderSide(color: prepGold),
@@ -738,72 +831,8 @@ List<Map<String, String>> _splitPreparation(String text) {
               title: 'نموذج التحضير',
               icon: Icons.description_outlined,
               children: [
-                
-..._splitPreparation(preparedLesson!).map((section) {
-  final index = _prepSections.indexOf(section['title'] ?? '');
-
-  return Container(
-    width: double.infinity,
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(
-        color: prepGreen.withValues(alpha: 0.20),
-      ),
-      borderRadius: BorderRadius.circular(14),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 30,
-              height: 30,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: prepGreen.withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Text(
-                index >= 0 ? '${index + 1}' : '•',
-                style: const TextStyle(
-                  color: prepGreen,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                section['title']!,
-                style: const TextStyle(
-                  color: prepGreen,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        SelectableText(
-          section['content']!.isEmpty
-              ? 'لم يُدرج محتوى لهذا القسم.'
-              : section['content']!,
-          style: const TextStyle(
-            color: Color(0xFF26372D),
-            fontSize: 14,
-            height: 1.9,
-          ),
-        ),
-      ],
-    ),
-  );
-}),
-
+                ..._splitPreparation(preparedLesson!)
+                    .map(_buildPreparationSection),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
