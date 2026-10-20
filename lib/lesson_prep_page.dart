@@ -209,10 +209,8 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             },
             body: jsonEncode({
               'messages': [
-                {
-                  
-{
-  'role': 'system',
+  {
+    'role': 'system',
   'content':
       'أنت خبير في إعداد الدروس وفق المنهاج السوري. '
       'أعد تحضير الدرس باللغة العربية بطريقة تربوية عملية ومفصلة. '
