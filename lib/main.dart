@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
@@ -201,7 +200,6 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-   
     if (section == 'تحضير الدروس') {
       Navigator.push(
         context,
@@ -731,26 +729,41 @@ class ArabicPage extends StatelessWidget {
               );
             },
           ),
+
+          // تم ربط بطاقة التحضير بصفحة التحضير الفعلية.
           ArabicFeatureCard(
             icon: Icons.edit_note_rounded,
             title: 'تحضير الدروس',
             subtitle: 'تحضير منظم مرتبط بالدروس وأهدافها',
             color: const Color(0xFF526C83),
-            onTap: () => showComingSoon(context, 'تحضير الدروس'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LessonPrepPage(),
+                ),
+              );
+            },
           ),
           ArabicFeatureCard(
             icon: Icons.extension_rounded,
             title: 'الأنشطة الشفهية والكتابية',
             subtitle: 'الاستماع والتعبير والإملاء والتدريبات',
             color: const Color(0xFF8A6A22),
-            onTap: () => showComingSoon(context, 'الأنشطة الشفهية والكتابية'),
+            onTap: () => showComingSoon(
+              context,
+              'الأنشطة الشفهية والكتابية',
+            ),
           ),
           ArabicFeatureCard(
             icon: Icons.assignment_rounded,
             title: 'أوراق العمل والامتحانات',
             subtitle: 'تدريبات وتقويمات مرتبطة بمحتوى الكتاب',
             color: const Color(0xFF426B55),
-            onTap: () => showComingSoon(context, 'أوراق العمل والامتحانات'),
+            onTap: () => showComingSoon(
+              context,
+              'أوراق العمل والامتحانات',
+            ),
           ),
           const SizedBox(height: 12),
           const Text(
@@ -940,7 +953,7 @@ class BookIndexPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'اختر الوحدة، ثم اضغط على الدرس لفتحه مباشرةً.',
+                  'اختر اسم الدرس لفتح الكتاب، أو اضغط أيقونة التحضير لتحضير الدرس.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -1008,11 +1021,48 @@ class BookIndexPage extends StatelessWidget {
                           fontSize: 12,
                         ),
                       ),
-                      trailing: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: gold,
-                        size: 17,
+
+                      // زر التحضير الجديد بجانب كل درس.
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'تحضير هذا الدرس',
+                            visualDensity: VisualDensity.compact,
+                            constraints: const BoxConstraints(
+                              minWidth: 40,
+                              minHeight: 40,
+                            ),
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.edit_note_rounded,
+                              color: royalGreen,
+                              size: 27,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => LessonPrepPage(
+                                    initialLessonTitle:
+                                        lesson['title'] as String,
+                                    initialUnitTitle:
+                                        unit['title'] as String,
+                                    initialPage: lesson['page'] as int,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: gold,
+                            size: 17,
+                          ),
+                        ],
                       ),
+
+                      // الضغط على اسم الدرس يبقي فتح الكتاب كما كان.
                       onTap: () {
                         Navigator.push(
                           context,
