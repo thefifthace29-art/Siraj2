@@ -293,14 +293,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
         });
       }
     }
-      if (mounted) {
-        setState(() {
-          isGenerating = false;
-        });
-      }
-    }
-
-    final buffer = StringBuffer();
+          final buffer = StringBuffer();
 
     buffer.writeln('تحضير درس: $lesson');
     buffer.writeln('━━━━━━━━━━━━━━━━━━━━');
