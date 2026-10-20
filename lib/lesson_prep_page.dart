@@ -1,9 +1,11 @@
 
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 const Color prepGreen = Color(0xFF0A4D2E);
 const Color prepGold = Color(0xFFD4AF37);
@@ -29,6 +31,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   final _formKey = GlobalKey<FormState>();
   final _lessonController = TextEditingController();
   final _unitController = TextEditingController();
+  final _pageController = TextEditingController();
   final _previousController = TextEditingController();
   final _notesController = TextEditingController();
 
@@ -39,6 +42,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
 
   String? preparedLesson;
   bool isGenerating = false;
+  bool isReadingPdf = false;
 
   static const List<String> _prepSections = [
     'مخرجات التعلم',
@@ -56,18 +60,46 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
   @override
   void initState() {
     super.initState();
-
     _lessonController.text = widget.initialLessonTitle ?? '';
     _unitController.text = widget.initialUnitTitle ?? '';
+    _pageController.text = widget.initialPage?.toString() ?? '';
   }
 
   @override
   void dispose() {
     _lessonController.dispose();
     _unitController.dispose();
+    _pageController.dispose();
     _previousController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  InputDecoration fieldDecoration(
+    String label, {
+    String? hint,
+    IconData? icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      prefixIcon: icon == null
+          ? null
+          : Icon(icon, color: prepGreen),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: prepGold.withOpacity(0.6)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: prepGreen, width: 1.5),
+      ),
+    );
   }
 
   Widget sectionTitle(String title, IconData icon) {
@@ -92,41 +124,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     );
   }
 
-  InputDecoration fieldDecoration(
-    String label, {
-    String? hint,
-    IconData? icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      prefixIcon: icon == null
-          ? null
-          : Icon(icon, color: prepGreen),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(
-          color: prepGold.withOpacity(0.6),
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: BorderSide(
-          color: prepGold.withOpacity(0.6),
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(
-          color: prepGreen,
-          width: 1.5,
-        ),
-      ),
-    );
-  }
-
   Widget textField({
     required String label,
     required TextEditingController controller,
@@ -134,18 +131,14 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     int maxLines = 1,
     bool requiredField = false,
     IconData? icon,
+    TextInputType? keyboardType,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      textInputAction: maxLines > 1
-          ? TextInputAction.newline
-          : TextInputAction.next,
-      decoration: fieldDecoration(
-        label,
-        hint: hint,
-        icon: icon,
-      ),
+      keyboardType: keyboardType,
+      textDirection: TextDirection.rtl,
+      decoration: fieldDecoration(label, hint: hint, icon: icon),
       validator: requiredField
           ? (value) {
               if (value == null || value.trim().isEmpty) {
@@ -195,9 +188,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(21),
-        border: Border.all(
-          color: prepGold.withOpacity(0.55),
-        ),
+        border: Border.all(color: prepGold.withOpacity(0.55)),
         boxShadow: [
           BoxShadow(
             color: prepGreen.withOpacity(0.035),
@@ -216,6 +207,59 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     );
   }
 
+  /// استخراج النص الفعلي من صفحة PDF.
+  ///
+  /// رقم الصفحة هنا هو رقم صفحة PDF ابتداءً من 1،
+  /// كما يستخدمه عارض الكتاب في التطبيق.
+  Future<String> _extractPdfPageText(int pageNumber) async {
+    if (pageNumber < 1) {
+      throw Exception('رقم صفحة الكتاب غير صالح.');
+    }
+
+    PdfDocument? document;
+
+    try {
+      final ByteData data =
+          await rootBundle.load('arabic_grade2_term1.pdf');
+
+      final Uint8List bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
+
+      document = PdfDocument(inputBytes: bytes);
+
+      if (pageNumber > document.pages.count) {
+        throw Exception(
+          'رقم الصفحة $pageNumber يتجاوز عدد صفحات ملف الكتاب '
+          '(${document.pages.count} صفحة). '
+          'تحقق من رقم الصفحة في الفهرس.',
+        );
+      }
+
+      final text = PdfTextExtractor(document).extractText(
+        startPageIndex: pageNumber - 1,
+        endPageIndex: pageNumber - 1,
+      );
+
+      final cleaned = text
+          .replaceAll('\u0000', '')
+          .replaceAll(RegExp(r'[ \t]+\n'), '\n')
+          .trim();
+
+      if (cleaned.isEmpty) {
+        throw Exception(
+          'لم أستطع استخراج نص من صفحة $pageNumber. '
+          'قد تكون الصفحة مصوّرة وليست نصية؛ عندها نحتاج إلى OCR.',
+        );
+      }
+
+      return cleaned;
+    } finally {
+      document?.dispose();
+    }
+  }
+
   Future<void> generatePreparation() async {
     if (isGenerating) return;
     if (!_formKey.currentState!.validate()) return;
@@ -224,113 +268,139 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     final unit = _unitController.text.trim();
     final previous = _previousController.text.trim();
     final notes = _notesController.text.trim();
+    final pageNumber = int.tryParse(_pageController.text.trim());
+
+    if (subject == 'العربية لغتي' &&
+        (pageNumber == null || pageNumber < 1)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('أدخل رقم صفحة الدرس لكي يقرأ التطبيق محتواها.'),
+        ),
+      );
+      return;
+    }
 
     setState(() {
       isGenerating = true;
+      isReadingPdf = subject == 'العربية لغتي';
       preparedLesson = null;
     });
 
     try {
-      final textbookPageText = widget.initialPage == null
-          ? ''
-          : '\nرقم صفحة الدرس في الكتاب: ${widget.initialPage}';
+      String textbookText = '';
+
+      if (subject == 'العربية لغتي') {
+        textbookText = await _extractPdfPageText(pageNumber!);
+
+        if (!mounted) return;
+
+        setState(() {
+          isReadingPdf = false;
+        });
+      }
+
+      final systemPrompt =
+          'أنت خبير في إعداد الدروس وفق المنهاج السوري. '
+          'استخدم نص الكتاب الذي يرسله المستخدم أساساً للتحضير. '
+          'اجعل التحضير مرتبطاً بمحتوى الصفحة الفعلي، ولا تنسب '
+          'إلى الكتاب نصوصاً أو معلومات غير موجودة في المحتوى المرسل. '
+          'إذا كان النص المستخرج غير كافٍ لتحديد جزء من الدرس، '
+          'صرّح بذلك بوضوح ولا تخترع تفاصيل على أنها من الكتاب. '
+          'أعد التحضير باللغة العربية الفصحى، بطريقة تربوية عملية '
+          'ومفصلة وقابلة للتطبيق. '
+          'التزم بالعناوين العشرة التالية وبالترتيب نفسه، '
+          'واكتب كل عنوان في سطر مستقل: '
+          'مخرجات التعلم، طرائق التدريس، موارد التعلم ووسائطه، '
+          'التمهيد والتهيئة، سير الدرس، إغلاق الدرس، التقويم المرحلي، '
+          'التقويم النهائي، نشاط للمتميزين، نشاط للأقل تحصيلاً. '
+          'لا تحذف أي عنوان. اجعل مخرجات التعلم قابلة للملاحظة والقياس. '
+          'فصّل سير الدرس إلى خطوات مرقمة، ووضح في كل خطوة دور المعلم '
+          'ودور المتعلم والزمن والأسئلة المتوقعة وإجاباتها. '
+          'وزع زمن الخطوات بحيث يساوي مدة الحصة المحددة. '
+          'اجعل التقويم المرحلي أثناء الدرس والتقويم النهائي في نهايته. '
+          'راعِ عمر الطلاب والفروق الفردية، وقدم نشاطاً إثرائياً '
+          'للمتميزين ونشاطاً مبسطاً للطلاب الذين يحتاجون إلى دعم.';
+
+      final userPrompt = StringBuffer()
+        ..writeln('أعد تحضير الدرس التالي وفق المنهاج السوري.')
+        ..writeln('المادة: $subject')
+        ..writeln('الصف: $grade')
+        ..writeln('عنوان الدرس: $lesson')
+        ..writeln('الوحدة أو المجال: $unit')
+        ..writeln('نوع الدرس: $lessonType')
+        ..writeln('مدة الحصة: $duration')
+        ..writeln('المعارف السابقة: $previous')
+        ..writeln('ملاحظات المعلم: $notes');
+
+      if (pageNumber != null) {
+        userPrompt.writeln('رقم صفحة PDF المقروءة: $pageNumber');
+      }
+
+      if (textbookText.isNotEmpty) {
+        userPrompt
+          ..writeln('\n--- بداية النص المستخرج من الكتاب ---')
+          ..writeln(textbookText)
+          ..writeln('--- نهاية النص المستخرج من الكتاب ---')
+          ..writeln(
+            'اعتمد على هذا النص في بناء الشرح والأمثلة والأسئلة '
+            'والإجابات والأنشطة. ميّز بين المعلومات الواردة في النص '
+            'والأنشطة التعليمية التي تقترحها أنت.',
+          );
+      } else {
+        userPrompt.writeln(
+          'لا يوجد نص مستخرج من ملف الكتاب لهذا الطلب. '
+          'لا تدّع أنك قرأت نص الكتاب.',
+        );
+      }
 
       final response = await http
           .post(
             Uri.parse(
               'https://siraj-groq-proxy.thefifthace29.workers.dev',
             ),
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'messages': [
-                {
-                  'role': 'system',
-                  'content':
-                      'أنت خبير في إعداد الدروس وفق المنهاج السوري. '
-                      'أعد تحضير الدرس باللغة العربية الفصحى، '
-                      'بطريقة تربوية عملية ومفصلة وقابلة للتطبيق. '
-                      'التزم بالعناوين العشرة التالية وبالترتيب نفسه، '
-                      'واكتب كل عنوان في سطر مستقل: '
-                      'مخرجات التعلم، طرائق التدريس، '
-                      'موارد التعلم ووسائطه، التمهيد والتهيئة، '
-                      'سير الدرس، إغلاق الدرس، التقويم المرحلي، '
-                      'التقويم النهائي، نشاط للمتميزين، '
-                      'نشاط للأقل تحصيلاً. '
-                      'لا تضف عنواناً رئيسياً آخر ولا تحذف أي عنوان. '
-                      'اجعل مخرجات التعلم قابلة للملاحظة والقياس. '
-                      'فصّل سير الدرس إلى خطوات مرقمة، '
-                      'ووضح في كل خطوة دور المعلم ودور المتعلم '
-                      'والزمن والأسئلة المتوقعة وإجاباتها. '
-                      'وزع زمن جميع خطوات الحصة بحيث يساوي مدة الحصة '
-                      'المحددة. '
-                      'اجعل التقويم المرحلي أثناء سير الدرس، '
-                      'والتقويم النهائي في نهاية الحصة. '
-                      'قدم نشاطاً إثرائياً للمتميزين ونشاطاً مبسطاً '
-                      'للطلاب الذين يحتاجون إلى دعم. '
-                      'لا تدّع الاطلاع على نص الكتاب إذا لم يُقدّم لك. '
-                      'إذا لم تتوفر تفاصيل محتوى الدرس، فاجعل التحضير '
-                      'مبنياً على عنوان الدرس، وتجنب اختلاق نصوص '
-                      'أو معلومات محددة ونسبتها إلى الكتاب.',
-                },
-                {
-                  'role': 'user',
-                  'content':
-                      'أعد تحضير الدرس التالي وفق المنهاج السوري:\n'
-                      'المادة: $subject\n'
-                      'الصف: $grade\n'
-                      'عنوان الدرس: $lesson\n'
-                      'الوحدة أو المجال: $unit\n'
-                      '$textbookPageText\n'
-                      'نوع الدرس: $lessonType\n'
-                      'مدة الحصة: $duration\n'
-                      'المعارف السابقة: $previous\n'
-                      'ملاحظات المعلم: $notes\n\n'
-                      'اكتب محتوى عملياً ومفصلاً يستطيع المعلم '
-                      'تنفيذه مباشرة داخل الصف، مع مراعاة عمر الطلاب '
-                      'والفروق الفردية. '
-                      'اكتب العناوين العشرة المطلوبة كما هي تماماً، '
-                      'واجعل لكل عنوان محتوى واضحاً ومفيداً.',
-                },
+                {'role': 'system', 'content': systemPrompt},
+                {'role': 'user', 'content': userPrompt.toString()},
               ],
             }),
           )
-          .timeout(const Duration(seconds: 45));
+          .timeout(const Duration(seconds: 90));
 
       if (response.statusCode != 200) {
         throw Exception(
           'تعذر الاتصال بخدمة التحضير '
-          '(رمز الاستجابة: ${response.statusCode})',
+          '(رمز الاستجابة: ${response.statusCode}).',
         );
       }
 
-      final decoded = jsonDecode(
-        utf8.decode(response.bodyBytes),
-      );
+      final decoded = jsonDecode(utf8.decode(response.bodyBytes));
 
       if (decoded is! Map<String, dynamic>) {
-        throw Exception('صيغة الاستجابة غير صالحة');
+        throw Exception('صيغة الاستجابة غير صالحة.');
       }
 
       final choices = decoded['choices'];
       if (choices is! List || choices.isEmpty) {
-        throw Exception('لم تصل نتيجة من خدمة التحضير');
+        throw Exception(
+          'لم تصل نتيجة من خدمة التحضير. تحقق من إعداد الخدمة.',
+        );
       }
 
       final firstChoice = choices.first;
       if (firstChoice is! Map) {
-        throw Exception('صيغة نتيجة التحضير غير صالحة');
+        throw Exception('صيغة نتيجة التحضير غير صالحة.');
       }
 
       final message = firstChoice['message'];
       if (message is! Map) {
-        throw Exception('لم يصل محتوى التحضير');
+        throw Exception('لم يصل محتوى التحضير.');
       }
 
       final result = message['content'];
       if (result is! String || result.trim().isEmpty) {
-        throw Exception('وصل محتوى فارغ من خدمة التحضير');
+        throw Exception('وصل محتوى فارغ من خدمة التحضير.');
       }
 
       if (!mounted) return;
@@ -344,13 +414,14 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تعذر إنشاء التحضير: $error'),
-          duration: const Duration(seconds: 8),
+          duration: const Duration(seconds: 10),
         ),
       );
     } finally {
       if (mounted) {
         setState(() {
           isGenerating = false;
+          isReadingPdf = false;
         });
       }
     }
@@ -360,9 +431,9 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     if (isGenerating) return;
 
     _formKey.currentState?.reset();
-
     _lessonController.text = widget.initialLessonTitle ?? '';
     _unitController.text = widget.initialUnitTitle ?? '';
+    _pageController.text = widget.initialPage?.toString() ?? '';
     _previousController.clear();
     _notesController.clear();
 
@@ -381,16 +452,15 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
         .replaceAll('__', '')
         .replaceAll('*', '')
         .replaceAll('#', '')
-        .replaceAll(RegExp(r'^[\s\d٠-٩١-٩.،:：؛\-ـ)（(]+'), '')
+        .replaceAll(
+          RegExp(r'^[\s\d٠-٩١-٩.،:：؛\-ـ)（(]+'),
+          '',
+        )
         .replaceAll(RegExp(r'[:：\-ـ]+$'), '')
         .trim();
   }
 
   List<Map<String, String>> _splitPreparation(String text) {
-    final sections = <Map<String, String>>[];
-    String? currentTitle;
-    final currentContent = StringBuffer();
-
     final aliases = <String, String>{
       'مخرجات التعلم': 'مخرجات التعلم',
       'الأهداف التعليمية': 'مخرجات التعلم',
@@ -423,86 +493,70 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       'نشاط علاجي': 'نشاط للأقل تحصيلاً',
     };
 
-    String? matchHeading(String line) {
-      var cleaned = _normalizeHeading(line);
+    final sections = <Map<String, String>>[];
+    String? currentTitle;
+    final buffer = StringBuffer();
 
-      // تجاهل الترقيم في بداية العنوان.
-      cleaned = cleaned.replaceFirst(
+    for (final line in text.split('\n')) {
+      var headingText = _normalizeHeading(line);
+      headingText = headingText.replaceFirst(
         RegExp(r'^[٠-٩١-٩0-9]+[\s.)،:\-ـ]+'),
         '',
       );
 
-      cleaned = cleaned.trim();
-
-      for (final entry in aliases.entries) {
-        if (cleaned == entry.key) {
-          return entry.value;
-        }
-      }
-
-      return null;
-    }
-
-    void saveSection() {
-      if (currentTitle != null) {
-        sections.add({
-          'title': currentTitle!,
-          'content': currentContent.toString().trim(),
-        });
-      }
-    }
-
-    for (final line in text.split('\n')) {
-      final heading = matchHeading(line);
+      final heading = aliases[headingText.trim()];
 
       if (heading != null) {
-        saveSection();
+        if (currentTitle != null) {
+          sections.add({
+            'title': currentTitle,
+            'content': buffer.toString().trim(),
+          });
+        }
+
         currentTitle = heading;
-        currentContent.clear();
+        buffer.clear();
       } else if (currentTitle != null) {
-        currentContent.writeln(line);
+        buffer.writeln(line);
       }
     }
 
-    saveSection();
+    if (currentTitle != null) {
+      sections.add({
+        'title': currentTitle,
+        'content': buffer.toString().trim(),
+      });
+    }
 
     if (sections.isEmpty) {
       return [
-        {
-          'title': 'التحضير الكامل',
-          'content': text.trim(),
-        },
+        {'title': 'التحضير الكامل', 'content': text.trim()},
       ];
     }
 
-    // عرض الأقسام وفق الترتيب المعتمد، حتى لو اختلف ترتيب
-    // العناوين في استجابة خدمة التحضير.
-    final orderedSections = <Map<String, String>>[];
+    final ordered = <Map<String, String>>[];
 
     for (final title in _prepSections) {
       for (final section in sections) {
         if (section['title'] == title) {
-          orderedSections.add(section);
+          ordered.add(section);
         }
       }
     }
 
-    // لا نفقد أي محتوى لم يتعرف المحلل على عنوانه.
     for (final section in sections) {
       if (!_prepSections.contains(section['title'])) {
-        orderedSections.add(section);
+        ordered.add(section);
       }
     }
 
-    return orderedSections;
+    return ordered;
   }
 
   Future<void> copyPreparation() async {
     if (preparedLesson == null) return;
 
-    await Clipboard.setData(
-      ClipboardData(text: preparedLesson!),
-    );
+    await Clipboard.setData(ClipboardData(text: preparedLesson!));
 
     if (!mounted) return;
 
@@ -514,9 +568,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
     );
   }
 
-  Widget _buildPreparationSection(
-    Map<String, String> section,
-  ) {
+  Widget _buildPreparationSection(Map<String, String> section) {
     final title = section['title'] ?? 'قسم التحضير';
     final content = section['content'] ?? '';
     final index = _prepSections.indexOf(title);
@@ -527,9 +579,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(
-          color: prepGreen.withOpacity(0.20),
-        ),
+        border: Border.all(color: prepGreen.withOpacity(0.20)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -569,9 +619,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
           ),
           const SizedBox(height: 10),
           SelectableText(
-            content.isEmpty
-                ? 'لم يُدرج محتوى لهذا القسم.'
-                : content,
+            content.isEmpty ? 'لم يُدرج محتوى لهذا القسم.' : content,
             style: const TextStyle(
               color: Color(0xFF26372D),
               fontSize: 14,
@@ -604,10 +652,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
             decoration: BoxDecoration(
               color: prepGreen,
               borderRadius: BorderRadius.circular(23),
-              border: Border.all(
-                color: prepGold,
-                width: 1.2,
-              ),
+              border: Border.all(color: prepGold, width: 1.2),
             ),
             child: Column(
               children: [
@@ -627,8 +672,8 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'أدخل معلومات الدرس لإعداد نموذج تحضير '
-                  'منظم يمكنك مراجعته وتخصيصه.',
+                  'يقرأ سِراج نص الصفحة المحددة من الكتاب، '
+                  'ثم يستخدم محتواها لإعداد تحضير مرتبط بالدرس.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -636,16 +681,6 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                     fontSize: 14,
                   ),
                 ),
-                if (widget.initialPage != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'صفحة الدرس في الكتاب: ${widget.initialPage}',
-                    style: const TextStyle(
-                      color: prepGold,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
@@ -710,6 +745,25 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                       hint: 'اسم الوحدة إن وجد',
                       icon: Icons.folder_outlined,
                     ),
+                    const SizedBox(height: 13),
+                    textField(
+                      label: 'رقم صفحة الدرس في ملف PDF',
+                      controller: _pageController,
+                      hint: 'أدخل رقم الصفحة كما تظهر في عارض الكتاب',
+                      requiredField: true,
+                      icon: Icons.picture_as_pdf_outlined,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'تُستخدم الصفحة لاستخراج النص من ملف الكتاب '
+                      'المضمّن في التطبيق.',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        height: 1.6,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
                 formCard(
@@ -773,9 +827,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                     style: FilledButton.styleFrom(
                       backgroundColor: prepGreen,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -792,8 +844,10 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                         : const Icon(Icons.auto_awesome_rounded),
                     label: Text(
                       isGenerating
-                          ? 'جارٍ إعداد التحضير...'
-                          : 'إعداد نموذج التحضير',
+                          ? (isReadingPdf
+                              ? 'جارٍ قراءة صفحة الكتاب...'
+                              : 'جارٍ إعداد التحضير...')
+                          : 'قراءة الدرس وإعداد التحضير',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -809,17 +863,13 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: prepGreen,
                       side: const BorderSide(color: prepGold),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     icon: const Icon(Icons.restart_alt_rounded),
-                    label: const Text(
-                      'مسح الحقول والبدء من جديد',
-                    ),
+                    label: const Text('مسح الحقول والبدء من جديد'),
                   ),
                 ),
               ],
@@ -841,9 +891,7 @@ class _LessonPrepPageState extends State<LessonPrepPage> {
                     style: FilledButton.styleFrom(
                       backgroundColor: prepGreen,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
