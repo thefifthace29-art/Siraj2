@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+// نموذج السؤال الخاص بتطبيق سِراج
+class SirajQuestion {
+  final String question;
+  final List<String> options;
+  final int correctIndex;
+  final String explanation;
+
+  const SirajQuestion({
+    required this.question,
+    required this.options,
+    required this.correctIndex,
+    required this.explanation,
+  });
+}
 
 // ألوان التطبيق الرئيسية
 const Color royalGreen = Color(0xFF0A4D2E);
