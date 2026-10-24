@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'lesson_prep_page.dart';
+import 'group_challenge_screen.dart';
 
 const Color cream = Color(0xFFFDFBF7);
 const Color royalGreen = Color(0xFF0A4D2E);
