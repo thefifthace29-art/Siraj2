@@ -1408,8 +1408,9 @@ class GameIntroPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'ستجيب عن ${activity.questions.length} أسئلة لغوية. '
-                    'اقرأ كل سؤال جيدًا، واختر الإجابة، وتعلّم من التفسير الذي يظهر بعد اختيارك.',
+                    activity.title == 'جزيرة الأسرار'
+                        ? 'ستعبر أربع محطات متتابعة: الشاطئ، وباب الكلمات، وجسر الأضداد، ثم كهف الكنز. افتح كل محطة بالإجابة الصحيحة واجمع الأدلة حتى تصل إلى الكنز.'
+                        : 'ستجيب عن ${activity.questions.length} أسئلة لغوية. اقرأ كل سؤال جيدًا، واختر الإجابة، وتعلّم من التفسير الذي يظهر بعد اختيارك.',
                     style: const TextStyle(
                       color: textColor,
                       fontSize: 14,
@@ -1436,7 +1437,9 @@ class GameIntroPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => LearningQuizPage(activity: activity),
+                    builder: (_) => activity.title == 'جزيرة الأسرار'
+                        ? const IslandAdventurePage()
+                        : LearningQuizPage(activity: activity),
                   ),
                 );
               },
@@ -1465,6 +1468,260 @@ class GameIntroPage extends StatelessWidget {
             label: const Text('العودة إلى الأنشطة'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ==================== مغامرة جزيرة الأسرار ====================
+
+class IslandAdventurePage extends StatefulWidget {
+  const IslandAdventurePage({super.key});
+
+  @override
+  State<IslandAdventurePage> createState() => _IslandAdventurePageState();
+}
+
+class _IslandAdventurePageState extends State<IslandAdventurePage> {
+  int stageIndex = 0;
+  int? selectedIndex;
+  bool answered = false;
+  bool completed = false;
+  int score = 0;
+
+  static const List<SirajQuestion> islandQuestions = [
+    SirajQuestion(
+      question: 'وصلت إلى الشاطئ. أي كلمة تبدأ بحرف الباء لتفتح الطريق؟',
+      options: ['قَمَر', 'بَحْر', 'شَجَر'],
+      correctIndex: 1,
+      explanation: 'أحسنت! «بَحْر» تبدأ بحرف الباء. حصلت على خريطة الجزيرة.',
+    ),
+    SirajQuestion(
+      question: 'وجدت بابًا عليه لغز: ما جمع كلمة «كتاب»؟',
+      options: ['كاتِب', 'مَكْتَب', 'كُتُب'],
+      correctIndex: 2,
+      explanation: 'صحيح! جمع «كتاب» هو «كُتُب». حصلت على المفتاح الأول.',
+    ),
+    SirajQuestion(
+      question: 'يحرس الجسر لغزٌ عن الأضداد. ما ضد كلمة «كبير»؟',
+      options: ['واسِع', 'صَغير', 'طَويل'],
+      correctIndex: 1,
+      explanation: 'رائع! ضد «كبير» هو «صغير». أصبح الجسر آمنًا للعبور.',
+    ),
+    SirajQuestion(
+      question: 'أمام الكنز ثلاث كلمات. اختر الكلمة التي تدل على حيوان.',
+      options: ['نافِذَة', 'مَدْرَسَة', 'أَسَد'],
+      correctIndex: 2,
+      explanation: 'أحسنت! الأسد حيوان، وقد جمعت الأدلة اللازمة لفتح الكنز.',
+    ),
+  ];
+
+  SirajQuestion get currentQuestion => islandQuestions[stageIndex];
+
+  void chooseAnswer(int index) {
+    if (answered || completed) return;
+    setState(() {
+      selectedIndex = index;
+      answered = true;
+      if (index == currentQuestion.correctIndex) score++;
+    });
+  }
+
+  void continueAdventure() {
+    if (!answered) return;
+    if (selectedIndex != currentQuestion.correctIndex) {
+      setState(() {
+        selectedIndex = null;
+        answered = false;
+      });
+      return;
+    }
+    if (stageIndex == islandQuestions.length - 1) {
+      setState(() => completed = true);
+      return;
+    }
+    setState(() {
+      stageIndex++;
+      selectedIndex = null;
+      answered = false;
+    });
+  }
+
+  void restartAdventure() {
+    setState(() {
+      stageIndex = 0;
+      selectedIndex = null;
+      answered = false;
+      completed = false;
+      score = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = completed ? 1.0 : (stageIndex + (answered && selectedIndex == currentQuestion.correctIndex ? 1 : 0)) / islandQuestions.length;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF168C83),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text('جزيرة الأسرار', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(18),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0A4D2E), Color(0xFF168C83)],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: gold, width: 1.2),
+              ),
+              child: Column(
+                children: [
+                  Text(completed ? '🏆' : '🏝️', style: const TextStyle(fontSize: 58)),
+                  const SizedBox(height: 8),
+                  Text(
+                    completed ? 'لقد عثرت على الكنز!' : 'مغامرة البحث عن الكنز',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: gold, fontSize: 23, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    completed
+                        ? 'أتممت مراحل الجزيرة وجمعت الأدلة الأربعة. نتيجتك $score من ${islandQuestions.length}.'
+                        : 'حلّ لغز كل محطة لتفتح الطريق إلى المحطة التالية. لا يمكنك الوصول إلى الكنز قبل جمع الأدلة!',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, height: 1.8, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFB7DCD4))),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(child: Text('خريطة الجزيرة', style: TextStyle(color: royalGreen, fontSize: 18, fontWeight: FontWeight.bold))),
+                      Text('${completed ? islandQuestions.length : stageIndex + 1} / ${islandQuestions.length}', style: const TextStyle(color: Color(0xFF168C83), fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: LinearProgressIndicator(value: progress, minHeight: 9, backgroundColor: const Color(0xFFE3EFEB), valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF168C83))),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(islandQuestions.length, (i) {
+                      final unlocked = completed || i < stageIndex || (i == stageIndex && answered && selectedIndex == currentQuestion.correctIndex);
+                      return Column(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(color: unlocked ? const Color(0xFFDDF3E8) : const Color(0xFFF0EEE8), shape: BoxShape.circle, border: Border.all(color: unlocked ? const Color(0xFF168C83) : const Color(0xFFD8D2C4), width: 1.5)),
+                            child: Text(unlocked ? '🔑' : (i == islandQuestions.length - 1 ? '💎' : '🔒'), style: const TextStyle(fontSize: 22)),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(['الشاطئ', 'الباب', 'الجسر', 'الكنز'][i], style: const TextStyle(fontSize: 11, color: textColor, fontWeight: FontWeight.w600)),
+                        ],
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            if (!completed) ...[
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(19),
+                decoration: BoxDecoration(color: const Color(0xFFFDFBF7), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0xFFB7DCD4), width: 1.4)),
+                child: Column(
+                  children: [
+                    Text(['🌊', '🚪', '🌉', '💎'][stageIndex], style: const TextStyle(fontSize: 42)),
+                    const SizedBox(height: 10),
+                    Text('المحطة ${stageIndex + 1}: ${['شاطئ الحروف', 'باب الكلمات', 'جسر الأضداد', 'كهف الكنز'][stageIndex]}', textAlign: TextAlign.center, style: const TextStyle(color: royalGreen, fontSize: 19, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    Text(currentQuestion.question, textAlign: TextAlign.center, style: const TextStyle(color: textColor, fontSize: 18, height: 1.8, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              for (int i = 0; i < currentQuestion.options.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Material(
+                    color: answered && i == currentQuestion.correctIndex ? const Color(0xFFDDF3E8) : answered && i == selectedIndex ? const Color(0xFFFFE5DF) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      onTap: () => chooseAnswer(i),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: answered && i == currentQuestion.correctIndex ? const Color(0xFF168C83) : const Color(0xFFE0DACE))),
+                        child: Row(
+                          children: [
+                            CircleAvatar(radius: 16, backgroundColor: const Color(0xFFE3F1ED), child: Text(['أ', 'ب', 'ج'][i], style: const TextStyle(color: royalGreen, fontWeight: FontWeight.bold))),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(currentQuestion.options[i], style: const TextStyle(color: textColor, fontSize: 17, fontWeight: FontWeight.w600))),
+                            if (answered && i == currentQuestion.correctIndex) const Icon(Icons.check_circle, color: Color(0xFF168C83)),
+                            if (answered && i == selectedIndex && i != currentQuestion.correctIndex) const Icon(Icons.cancel, color: Colors.redAccent),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (answered) ...[
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(color: selectedIndex == currentQuestion.correctIndex ? const Color(0xFFE5F5EB) : const Color(0xFFFFF0E8), borderRadius: BorderRadius.circular(15)),
+                  child: Text(currentQuestion.explanation, style: const TextStyle(color: textColor, height: 1.8)),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: continueAdventure,
+                    style: FilledButton.styleFrom(backgroundColor: const Color(0xFF168C83), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 15), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+                    icon: Icon(selectedIndex == currentQuestion.correctIndex && stageIndex == islandQuestions.length - 1 ? Icons.emoji_events : selectedIndex == currentQuestion.correctIndex ? Icons.arrow_back : Icons.refresh),
+                    label: Text(selectedIndex == currentQuestion.correctIndex ? (stageIndex == islandQuestions.length - 1 ? 'افتح الكنز' : 'افتح الطريق إلى المحطة التالية') : 'حاول مرة أخرى', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                ),
+              ],
+            ] else ...[
+              const SizedBox(height: 22),
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(color: const Color(0xFFFFF6D9), borderRadius: BorderRadius.circular(22), border: Border.all(color: gold, width: 1.5)),
+                child: const Column(
+                  children: [
+                    Text('🗝️ 💰 ⭐', style: TextStyle(fontSize: 42)),
+                    SizedBox(height: 12),
+                    Text('الكنز لك يا بطل سِراج!', textAlign: TextAlign.center, style: TextStyle(color: royalGreen, fontSize: 23, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('لقد استخدمت القراءة والتفكير لتجاوز المحطات الأربع. تذكّر: الخطأ فرصة للتعلّم، والمحاولة تقرّبك من النجاح.', textAlign: TextAlign.center, style: TextStyle(color: textColor, height: 1.9)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(width: double.infinity, child: FilledButton.icon(onPressed: restartAdventure, style: FilledButton.styleFrom(backgroundColor: const Color(0xFF168C83), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 15)), icon: const Icon(Icons.replay_rounded), label: const Text('أعد المغامرة'))),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_forward), label: const Text('العودة إلى الأنشطة')),
+            ],
+          ],
+        ),
       ),
     );
   }
