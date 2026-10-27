@@ -1,4 +1,4 @@
- import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'lesson_prep_page.dart';
@@ -2932,7 +2932,8 @@ class BookIndexPage extends StatelessWidget {
       ],
     },
   ];
-override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -3275,4 +3276,546 @@ class _TextbookPageState extends State<TextbookPage> {
               ],
             ),
           ),
-       
+          Expanded(
+            child: loadingError != null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            color: Colors.redAccent,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'تعذّر فتح الكتاب.',
+                            style: TextStyle(
+                              color: royalGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'تحقّق من اسم ملف PDF ومساره في المستودع، ثم أعد البناء.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(height: 1.7),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : PdfViewPinch(
+                    controller: pdfController,
+                    onPageChanged: (page) {
+                      if (mounted) {
+                        setState(() => currentPage = page);
+                      }
+                    },
+                    builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
+                      options: const DefaultBuilderOptions(),
+                      documentLoaderBuilder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: royalGreen,
+                        ),
+                      ),
+                      pageLoaderBuilder: (_) => const Center(
+                        child: CircularProgressIndicator(
+                          color: royalGreen,
+                        ),
+                      ),
+                      errorBuilder: (_, error) => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text(
+                            'حدث خطأ أثناء عرض صفحات الكتاب.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== بطاقة القسم الرئيسية ====================
+
+class SectionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const SectionCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: gold.withOpacity(0.75),
+              width: 1.1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 47,
+                height: 47,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const Spacer(),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Color(0xFF6B746D),
+                  fontSize: 12,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      'استكشاف القسم',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_back_rounded,
+                    color: color,
+                    size: 15,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ==================== أوراق العمل والمذاكرات والامتحانات ====================
+
+class PaperQuestion {
+  final String prompt;
+  final String answer;
+  final int marks;
+  const PaperQuestion(this.prompt, this.answer, {this.marks = 1});
+}
+
+class ReadyPaper {
+  final String title;
+  final String subtitle;
+  final String category;
+  final String unit;
+  final String pages;
+  final List<PaperQuestion> questions;
+  const ReadyPaper({
+    required this.title,
+    required this.subtitle,
+    required this.category,
+    required this.unit,
+    required this.pages,
+    required this.questions,
+  });
+  int get totalMarks => questions.fold(0, (sum, q) => sum + q.marks);
+}
+
+const List<ReadyPaper> readyPapers = [
+  ReadyPaper(title: 'اليوم الأول في المدرسة', subtitle: 'ورقة عمل الدرس الأول', category: 'ورقة عمل', unit: 'الوحدة الأولى: المواطنة والانتماء', pages: '4–11', questions: [
+    PaperQuestion('أكتب جملة تصف فيها استعدادك للذهاب إلى المدرسة.', 'مثال: أرتّب حقيبتي وأذهب إلى مدرستي بنشاط.'),
+    PaperQuestion('أذكر شيئين أحتاج إليهما في حقيبتي المدرسية.', 'كتاب ودفتر، أو قلم وممحاة.'),
+    PaperQuestion('أرتّب الأحداث: الذهاب إلى المدرسة – الاستيقاظ – تجهيز الحقيبة.', 'الاستيقاظ، ثم تجهيز الحقيبة، ثم الذهاب إلى المدرسة.'),
+    PaperQuestion('أكمل: أحافظ على مدرستي لأنّها…', 'مكان أتعلّم فيه وأقضي وقتًا مع زملائي.'),
+  ]),
+  ReadyPaper(title: 'من حقي أن أتعلم', subtitle: 'ورقة عمل الدرس الثاني', category: 'ورقة عمل', unit: 'الوحدة الأولى: المواطنة والانتماء', pages: '12–19', questions: [
+    PaperQuestion('أذكر حقًّا من حقوق الطفل وواجبًا من واجباته.', 'من حقي أن أتعلم، ومن واجبي احترام المعلّم والمحافظة على المدرسة.'),
+    PaperQuestion('أكمل: أتعلم اليوم لكي…', 'أبني مستقبلي وأحقق أحلامي.'),
+    PaperQuestion('لماذا نذهب إلى المدرسة؟', 'لنتعلم ونكتسب المعرفة والمهارات.'),
+    PaperQuestion('أكتب جملتين عن مهنة أتمنى أن أعمل بها.', 'إجابة شخصية مناسبة تتضمن اسم المهنة وسبب اختيارها.'),
+  ]),
+  ReadyPaper(title: 'وطني', subtitle: 'ورقة عمل الدرس الثالث', category: 'ورقة عمل', unit: 'الوحدة الأولى: المواطنة والانتماء', pages: '20–26', questions: [
+    PaperQuestion('أكمل: أحبّ وطني لأنّه…', 'إجابة مناسبة مثل: أرضي التي أعيش فيها وبين أهلي.'),
+    PaperQuestion('أذكر سلوكين أعبّر بهما عن حبّي لوطني.', 'أحافظ على نظافته، وأحترم قوانينه ورموزه.'),
+    PaperQuestion('أكتب ثلاث كلمات ترتبط بالوطن.', 'مثل: أرض، أهل، علم.'),
+    PaperQuestion('أكتب جملة جميلة عن سورية.', 'إجابة شخصية مناسبة عن حب سورية والاعتزاز بها.'),
+  ]),
+  ReadyPaper(title: 'الزيتونة والريح', subtitle: 'ورقة عمل الدرس الرابع', category: 'ورقة عمل', unit: 'الوحدة الأولى: المواطنة والانتماء', pages: '27–35', questions: [
+    PaperQuestion('أصف الزيتونة بكلمتين مناسبتين.', 'مثال: قوية، مثمرة.'),
+    PaperQuestion('ما الفكرة التي نتعلمها من قصة الزيتونة والريح؟', 'الصبر والثبات وعدم الاستسلام للصعوبات؛ وتُقبل الإجابة الموافقة لمضمون النص.'),
+    PaperQuestion('أذكر فائدة واحدة لشجرة الزيتون.', 'تعطي الزيتون الذي نستخرج منه الزيت، وتفيد البيئة.'),
+    PaperQuestion('أكتب جملة أستخدم فيها كلمة «الريح».', 'مثال: حرّكت الريح أغصان الشجرة.'),
+  ]),
+  ReadyPaper(title: 'هيا نسبح', subtitle: 'ورقة عمل الدرس الخامس', category: 'ورقة عمل', unit: 'الوحدة الثانية: الرياضة والفنون', pages: '36–43', questions: [
+    PaperQuestion('أذكر فائدتين لممارسة الرياضة.', 'تقوّي الجسم وتنشّط الدورة الدموية وتساعد على الصحة.'),
+    PaperQuestion('أذكر قاعدتين للسلامة عند السباحة.', 'السباحة بإشراف شخص بالغ، وعدم الابتعاد عن المكان الآمن.'),
+    PaperQuestion('أكمل: قبل السباحة أحرص على…', 'اتباع تعليمات السلامة والإحماء.'),
+    PaperQuestion('أكتب جملة تشجّع زملائي على ممارسة الرياضة.', 'مثال: الرياضة تقوّي أجسامنا، فلنمارسها بانتظام.'),
+  ]),
+  ReadyPaper(title: 'تحدي الأذكياء', subtitle: 'ورقة عمل الدرس السادس', category: 'ورقة عمل', unit: 'الوحدة الثانية: الرياضة والفنون', pages: '44–50', questions: [
+    PaperQuestion('ما الصفات التي تساعد على حلّ الألغاز؟', 'الانتباه والتفكير والصبر.'),
+    PaperQuestion('أذكر طريقة واحدة أتبعها عندما أواجه سؤالًا صعبًا.', 'أقرأ السؤال جيدًا، وأفكر، ثم أجرب الحل.'),
+    PaperQuestion('أكتب لغزًا بسيطًا لزميلي ثم أكتب إجابته.', 'إجابة شخصية؛ مثال: ما الشيء الذي نكتب به؟ القلم.'),
+    PaperQuestion('لماذا نتعاون في التحديات الجماعية؟', 'لنتبادل الأفكار ونصل إلى الحل معًا.'),
+  ]),
+  ReadyPaper(title: 'عشاق الأغاني', subtitle: 'ورقة عمل الدرس السابع', category: 'ورقة عمل', unit: 'الوحدة الثانية: الرياضة والفنون', pages: '51–56', questions: [
+    PaperQuestion('ما الذي يجعل أداء الأغنية واضحًا وجميلًا؟', 'وضوح النطق، وحسن الإلقاء، ومراعاة الإيقاع.'),
+    PaperQuestion('أذكر شعورًا قد تنقله إلينا أغنية جميلة.', 'الفرح أو الحماس أو المحبة.'),
+    PaperQuestion('أختار كلمات من الدرس وأقرأها بصوت واضح.', 'يُقيّم المعلم وضوح القراءة وسلامة النطق من كلمات النص.'),
+    PaperQuestion('أكتب جملة عن فنّ أحبّه.', 'إجابة شخصية مناسبة.'),
+  ]),
+  ReadyPaper(title: 'العالم الطبيب', subtitle: 'ورقة عمل الدرس الثامن', category: 'ورقة عمل', unit: 'الوحدة الثانية: الرياضة والفنون', pages: '57–67', questions: [
+    PaperQuestion('ما أهمية عمل الطبيب؟', 'يساعد المرضى ويحافظ على صحتهم.'),
+    PaperQuestion('أذكر ثلاث عادات تساعدني على المحافظة على صحتي.', 'تناول الطعام الصحي، وغسل اليدين، والنوم الكافي.'),
+    PaperQuestion('أكمل: عندما أمرض فإنني…', 'أخبر أهلي وأراجع الطبيب عند الحاجة.'),
+    PaperQuestion('أكتب جملتين أشكر فيهما العاملين في المجال الصحي.', 'إجابة مناسبة تعبّر عن الشكر والتقدير.'),
+  ]),
+  ReadyPaper(title: 'جرة الفخار وجرة الحديد', subtitle: 'ورقة عمل الدرس التاسع', category: 'ورقة عمل', unit: 'الوحدة الثالثة: دنيا العلوم', pages: '68–70', questions: [
+    PaperQuestion('أقارن بين الفخار والحديد من حيث الصلابة.', 'الحديد أصلب من الفخار، والفخار قابل للكسر.'),
+    PaperQuestion('لماذا يجب أن نحذر عند حمل الأشياء القابلة للكسر؟', 'لأنها قد تنكسر وتسبب الأذى.'),
+    PaperQuestion('أذكر شيئًا مصنوعًا من الفخار وآخر مصنوعًا من الحديد.', 'مثل: جرة فخارية، وباب حديدي.'),
+    PaperQuestion('أكتب جملة أستخدم فيها كلمة «جرة».', 'مثال: وضعت الماء في الجرة.'),
+  ]),
+  ReadyPaper(title: 'رحلة الفضاء', subtitle: 'ورقة عمل الدرس العاشر', category: 'ورقة عمل', unit: 'الوحدة الثالثة: دنيا العلوم', pages: '71–77', questions: [
+    PaperQuestion('أذكر اسم جرم سماوي نراه في السماء.', 'الشمس أو القمر أو أحد النجوم.'),
+    PaperQuestion('ما الوسيلة التي يستخدمها روّاد الفضاء للوصول إلى الفضاء؟', 'مركبة أو صاروخ فضائي.'),
+    PaperQuestion('أكتب سؤالًا أودّ معرفة إجابته عن الفضاء.', 'إجابة شخصية مناسبة مرتبطة بالفضاء.'),
+    PaperQuestion('أكمل: أريد أن أكتشف الفضاء لأنّ…', 'إجابة شخصية مناسبة.'),
+  ]),
+  ReadyPaper(title: 'متحف دمشق التربوي', subtitle: 'ورقة عمل الدرس الحادي عشر', category: 'ورقة عمل', unit: 'الوحدة الثالثة: دنيا العلوم', pages: '78–84', questions: [
+    PaperQuestion('ما الفائدة من زيارة المتحف؟', 'نتعرف إلى أشياء من الماضي ونتعلم معلومات جديدة.'),
+    PaperQuestion('كيف أحافظ على المعروضات في المتحف؟', 'لا ألمسها دون إذن، ولا أعبث بها، وألتزم بالتعليمات.'),
+    PaperQuestion('أذكر شيئًا يمكن أن أشاهده في متحف.', 'أداة قديمة أو صورة أو قطعة تراثية.'),
+    PaperQuestion('أكتب جملتين أدعو فيهما زميلي إلى زيارة متحف.', 'إجابة مناسبة تتضمن الدعوة وفائدة الزيارة.'),
+  ]),
+  ReadyPaper(title: 'هل تعلم؟', subtitle: 'ورقة عمل الدرس الثاني عشر', category: 'ورقة عمل', unit: 'الوحدة الثالثة: دنيا العلوم', pages: '85 وما بعدها', questions: [
+    PaperQuestion('ما الفرق بين الحقيقة والمعلومة التي تحتاج إلى تحقق؟', 'الحقيقة يمكن دعمها بدليل موثوق، أما المعلومة غير المتحقّق منها فلا نعتمدها مباشرة.'),
+    PaperQuestion('أذكر معلومة علمية أعرفها وأشرح كيف يمكن التحقق منها.', 'إجابة مناسبة مع ذكر مصدر موثوق مثل الكتاب أو المعلم.'),
+    PaperQuestion('لماذا نطرح الأسئلة ونبحث عن الإجابات؟', 'لنتعلم ونفهم العالم من حولنا.'),
+    PaperQuestion('أكتب جملة تبدأ بعبارة «هل تعلم أن…».', 'إجابة مناسبة بمعلومة صحيحة يمكن التحقق منها.'),
+  ]),
+  ReadyPaper(title: 'مذاكرة الوحدة الأولى', subtitle: 'مراجعة المواطنة والانتماء', category: 'مذاكرة', unit: 'الوحدة الأولى: المواطنة والانتماء', pages: '4–35', questions: [
+    PaperQuestion('أذكر حقًّا من حقوق الطفل وواجبًا تجاه المدرسة.', 'من حقي أن أتعلم، ومن واجبي المحافظة على المدرسة واحترام الآخرين.'),
+    PaperQuestion('أكتب جملة تعبّر عن حبّ الوطن.', 'إجابة مناسبة تعبّر عن الانتماء وحب الوطن.'),
+    PaperQuestion('أذكر فائدة واحدة لشجرة الزيتون.', 'تعطي ثمار الزيتون التي يُستخرج منها الزيت.'),
+    PaperQuestion('أكتب فقرة من ثلاث جمل عن مدرستي أو وطني.', 'تُقبل فقرة مترابطة من ثلاث جمل سليمة ومناسبة للموضوع.' , marks: 3),
+    PaperQuestion('أرتّب كلماتي في جملة مفيدة: (أحبّ – وطني – أنا).', 'أنا أحبّ وطني.'),
+  ]),
+  ReadyPaper(title: 'مذاكرة الوحدة الثانية', subtitle: 'مراجعة الرياضة والفنون', category: 'مذاكرة', unit: 'الوحدة الثانية: الرياضة والفنون', pages: '36–67', questions: [
+    PaperQuestion('أذكر فائدتين للرياضة وقاعدة سلامة واحدة.', 'تقوّي الجسم وتنشّطه؛ ومن قواعد السلامة السباحة بإشراف بالغ.'),
+    PaperQuestion('كيف أتصرف عند مواجهة لغز صعب؟', 'أقرأه بانتباه وأفكر وأجرّب الحل وأستعين بالتعاون عند الحاجة.'),
+    PaperQuestion('أذكر صفتين للإلقاء الجيد.', 'وضوح الصوت وسلامة النطق.'),
+    PaperQuestion('أكتب جملتين عن أهمية الطبيب.', 'إجابة مناسبة توضّح أن الطبيب يعالج المرضى ويساعد على حفظ الصحة.'),
+    PaperQuestion('أكتب نصيحة صحية لزملائي.', 'مثال: اغسلوا أيديكم قبل الطعام وبعده.'),
+  ]),
+  ReadyPaper(title: 'مذاكرة الوحدة الثالثة', subtitle: 'مراجعة دنيا العلوم', category: 'مذاكرة', unit: 'الوحدة الثالثة: دنيا العلوم', pages: '68–85 وما بعدها', questions: [
+    PaperQuestion('أقارن بين الفخار والحديد من حيث قابلية الكسر.', 'الفخار قابل للكسر بسهولة أكبر، والحديد أكثر صلابة.'),
+    PaperQuestion('أذكر وسيلة تصل بنا إلى الفضاء.', 'مركبة فضائية أو صاروخ.'),
+    PaperQuestion('أذكر سلوكًا صحيحًا عند زيارة المتحف.', 'المحافظة على المعروضات والالتزام بالتعليمات.'),
+    PaperQuestion('كيف أتحقق من صحة معلومة علمية؟', 'أرجع إلى مصدر موثوق مثل الكتاب أو المعلم أو مرجع علمي.'),
+    PaperQuestion('أكتب جملة استفهامية عن الفضاء.', 'مثال: كيف يعيش روّاد الفضاء في المركبة؟'),
+  ]),
+  ReadyPaper(title: 'المذاكرة الشاملة للفصل الأول', subtitle: 'مراجعة الوحدات الثلاث', category: 'مذاكرة', unit: 'جميع الوحدات', pages: '4–85 وما بعدها', questions: [
+    PaperQuestion('أذكر حقًّا وواجبًا من حياتي المدرسية.', 'من حقي أن أتعلم، ومن واجبي احترام المعلم والزملاء.'),
+    PaperQuestion('أكتب نصيحة للمحافظة على الصحة.', 'مثال: أتناول غذاءً صحيًا وأمارس الرياضة.'),
+    PaperQuestion('أذكر معلومة تعلمتها عن الفضاء أو المتحف.', 'إجابة صحيحة مناسبة لموضوع الدرس.'),
+    PaperQuestion('أكتب فقرة من أربع جمل عن موضوع أحببته في الكتاب.', 'تُقبل فقرة من أربع جمل مترابطة وسليمة ومتصلة بأحد موضوعات الكتاب.', marks: 4),
+    PaperQuestion('أراجع كتابتي وأضع علامات الترقيم المناسبة.', 'تُقيّم سلامة الكتابة واستخدام النقطة وعلامة الاستفهام حيث تلزم.'),
+  ]),
+  ReadyPaper(title: 'نموذج امتحان (أ)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('أكتب جملة عن أهمية التعلّم.', 'إجابة مناسبة مثل: يساعدني التعلّم على بناء مستقبلي.', marks: 2),
+    PaperQuestion('أذكر سلوكين يدلّان على حبّ الوطن.', 'المحافظة على النظافة واحترام رموز الوطن.', marks: 2),
+    PaperQuestion('أذكر فائدتين للرياضة.', 'تقوّي الجسم وتحافظ على الصحة.', marks: 2),
+    PaperQuestion('أذكر عملًا يقوم به الطبيب.', 'يعالج المرضى ويساعدهم على المحافظة على صحتهم.', marks: 2),
+    PaperQuestion('أقارن بين جرة الفخار وجرة الحديد.', 'الفخار قابل للكسر، والحديد أكثر صلابة.', marks: 2),
+    PaperQuestion('أكتب جملتين عن موضوع أعجبني في الكتاب.', 'جملتان مترابطتان وسليمتان عن أحد موضوعات الكتاب.', marks: 4),
+  ]),
+  ReadyPaper(title: 'نموذج امتحان (ب)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('أذكر حقًّا من حقوق الطفل وواجبًا من واجباته.', 'من حقي أن أتعلم، ومن واجبي احترام الآخرين.', marks: 2),
+    PaperQuestion('أكتب نصيحة لصديق يريد تعلّم السباحة.', 'يتعلم السباحة بإشراف مدرب أو شخص بالغ، ويلتزم قواعد السلامة.', marks: 2),
+    PaperQuestion('كيف يساعدنا التفكير في حلّ التحديات؟', 'يساعدنا على تحليل السؤال وتجربة الحلول المناسبة.', marks: 2),
+    PaperQuestion('أذكر فائدة من زيارة المتحف.', 'التعرّف إلى آثار الماضي والتعلّم منها.', marks: 2),
+    PaperQuestion('كيف أتحقق من معلومة سمعتها؟', 'أراجع مصدرًا موثوقًا وأسأل المعلم أو أبحث في الكتاب.', marks: 2),
+    PaperQuestion('أكتب فقرة قصيرة عن مدرستي أو صحتي أو وطني.', 'فقرة مترابطة من ثلاث أو أربع جمل مناسبة للموضوع.', marks: 4),
+  ]),
+  ReadyPaper(title: 'نموذج امتحان (ج)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('أكمل: من واجبي تجاه مدرستي أن…', 'أحافظ على نظافتها وأحترم المعلم والزملاء.', marks: 2),
+    PaperQuestion('أذكر شيئًا مصنوعًا من الفخار وآخر من الحديد.', 'جرة فخارية وباب حديدي، أو مثالان صحيحان آخران.', marks: 2),
+    PaperQuestion('أذكر اسم جرم سماوي ووسيلة للوصول إلى الفضاء.', 'القمر أو الشمس أو النجوم؛ مركبة فضائية أو صاروخ.', marks: 2),
+    PaperQuestion('أذكر سلوكين يساعدان على المحافظة على الصحة.', 'غسل اليدين وتناول غذاء صحي مثلًا.', marks: 2),
+    PaperQuestion('أكتب جملة استفهامية عن موضوع علمي.', 'مثال: كيف يصل روّاد الفضاء إلى القمر؟', marks: 2),
+    PaperQuestion('أكتب أربع جمل مترابطة عن موضوع من موضوعات الكتاب.', 'تُقيّم الجمل من حيث ارتباطها بالموضوع وسلامة اللغة والترابط.', marks: 4),
+  ]),
+];
+
+class WorksheetsExamsPage extends StatefulWidget {
+  const WorksheetsExamsPage({super.key});
+
+  @override
+  State<WorksheetsExamsPage> createState() => _WorksheetsExamsPageState();
+}
+
+class _WorksheetsExamsPageState extends State<WorksheetsExamsPage> {
+  String _selectedCategory = 'الكل';
+  final List<String> _categories = const ['الكل', 'ورقة عمل', 'مذاكرة', 'امتحان'];
+
+  @override
+  Widget build(BuildContext context) {
+    final papers = readyPapers.where((paper) =>
+        _selectedCategory == 'الكل' || paper.category == _selectedCategory).toList();
+    return Scaffold(
+      backgroundColor: cream,
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text('أوراق العمل والمذاكرات والامتحانات',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: royalGreen,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: gold, width: 1.3),
+            ),
+            child: const Column(children: [
+              Icon(Icons.menu_book_rounded, color: gold, size: 42),
+              SizedBox(height: 8),
+              Text('تعلّم، تدرّب، وتقدّم', textAlign: TextAlign.center,
+                  style: TextStyle(color: gold, fontWeight: FontWeight.bold, fontSize: 22)),
+              SizedBox(height: 7),
+              Text('نماذج جاهزة مستندة إلى موضوعات كتاب العربية لغتي للصف الثاني الأساسي، ومتاحة دون اتصال بالإنترنت.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, height: 1.7)),
+            ]),
+          ),
+          const SizedBox(height: 16),
+          Wrap(spacing: 8, runSpacing: 8, children: _categories.map((category) =>
+            ChoiceChip(
+              label: Text(category),
+              selected: _selectedCategory == category,
+              selectedColor: gold.withOpacity(0.35),
+              onSelected: (_) => setState(() => _selectedCategory = category),
+              labelStyle: TextStyle(color: _selectedCategory == category ? royalGreen : textColor,
+                  fontWeight: FontWeight.bold),
+            )).toList()),
+          const SizedBox(height: 12),
+          Text('عدد النماذج: ${papers.length}', style: const TextStyle(
+              color: textColor, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          ...papers.map((paper) => Card(
+            color: Colors.white,
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(color: gold.withOpacity(0.55)),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+              leading: Container(
+                width: 46, height: 46,
+                decoration: BoxDecoration(color: royalGreen.withOpacity(0.09),
+                    borderRadius: BorderRadius.circular(14)),
+                child: Icon(_iconForCategory(paper.category), color: royalGreen),
+              ),
+              title: Text(paper.title, style: const TextStyle(color: royalGreen,
+                  fontWeight: FontWeight.bold)),
+              subtitle: Padding(padding: const EdgeInsets.only(top: 5),
+                child: Text('${paper.subtitle}\n${paper.unit} · الصفحات: ${paper.pages}\n${paper.questions.length} أسئلة · ${paper.totalMarks} علامة',
+                    style: const TextStyle(height: 1.5, fontSize: 12))),
+              isThreeLine: true,
+              trailing: const Icon(Icons.chevron_left_rounded, color: gold, size: 27),
+              onTap: () => Navigator.push(context, MaterialPageRoute(
+                builder: (_) => ReadyPaperDetailPage(paper: paper))),
+            ),
+          )),
+          const SizedBox(height: 8),
+          const Text('تنبيه للمعلم: صيغت هذه النماذج التدريبية انطلاقًا من موضوعات الدروس ومهاراتها، وليست نقلًا حرفيًا لأسئلة الكتاب. يُرجى مطابقة أي سؤال مع النص والمهارات التي دُرّست فعليًا قبل اعتماد الدرجة النهائية.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: textColor, fontSize: 12, height: 1.7)),
+        ],
+      ),
+    );
+  }
+
+  IconData _iconForCategory(String category) {
+    switch (category) {
+      case 'ورقة عمل': return Icons.edit_note_rounded;
+      case 'مذاكرة': return Icons.menu_book_rounded;
+      default: return Icons.assignment_turned_in_rounded;
+    }
+  }
+}
+
+class ReadyPaperDetailPage extends StatefulWidget {
+  final ReadyPaper paper;
+  const ReadyPaperDetailPage({super.key, required this.paper});
+
+  @override
+  State<ReadyPaperDetailPage> createState() => _ReadyPaperDetailPageState();
+}
+
+class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
+  bool _showAnswers = false;
+  final TextEditingController _studentNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _studentNameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final paper = widget.paper;
+    return Scaffold(
+      backgroundColor: cream,
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(paper.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        actions: [IconButton(
+          tooltip: _showAnswers ? 'إخفاء الإجابات' : 'عرض الإجابات النموذجية',
+          icon: Icon(_showAnswers ? Icons.visibility_off_rounded : Icons.visibility_rounded),
+          onPressed: () => setState(() => _showAnswers = !_showAnswers),
+        )],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: gold.withOpacity(0.65))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              const Center(child: Text('الجمهورية العربية السورية', style: TextStyle(fontWeight: FontWeight.bold))),
+              const Center(child: Text('مادة اللغة العربية – الصف الثاني الأساسي', style: TextStyle(fontWeight: FontWeight.bold))),
+              const SizedBox(height: 12),
+              Text(paper.title, textAlign: TextAlign.center,
+                  style: const TextStyle(color: royalGreen, fontWeight: FontWeight.bold, fontSize: 20)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _studentNameController,
+                textDirection: TextDirection.rtl,
+                decoration: const InputDecoration(
+                  labelText: 'اسم التلميذ/ة',
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text('${paper.unit}  |  الصفحات المرجعية: ${paper.pages}',
+                  textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, height: 1.6)),
+              Text('الدرجة الكلية: ${paper.totalMarks}', textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: royalGreen)),
+            ]),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: gold.withOpacity(0.13), borderRadius: BorderRadius.circular(12)),
+            child: Text(_showAnswers ? 'نسخة المعلم: تظهر الإجابات النموذجية أسفل الأسئلة.' : 'نسخة التلميذ: أجب عن الأسئلة في دفترك أو على الورقة.',
+                textAlign: TextAlign.center, style: const TextStyle(color: textColor, height: 1.6)),
+          ),
+          const SizedBox(height: 12),
+          ...List.generate(paper.questions.length, (index) {
+            final question = paper.questions[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: royalGreen.withOpacity(0.18))),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  CircleAvatar(radius: 15, backgroundColor: royalGreen,
+                      child: Text('${index + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                  const SizedBox(width: 9),
+                  Expanded(child: Text(question.prompt, style: const TextStyle(
+                      color: textColor, fontSize: 15, fontWeight: FontWeight.w600, height: 1.7))),
+                  Text('${question.marks} ع', style: const TextStyle(color: royalGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                ]),
+                if (_showAnswers) ...[
+                  const SizedBox(height: 10),
+                  Container(padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: royalGreen.withOpacity(0.07), borderRadius: BorderRadius.circular(10)),
+                    child: Text('الإجابة النموذجية: ${question.answer}',
+                        style: const TextStyle(color: royalGreen, height: 1.7))),
+                ] else ...[
+                  const SizedBox(height: 22),
+                  const Divider(height: 1),
+                  const SizedBox(height: 18),
+                  const Divider(height: 1),
+                ],
+              ]),
+            );
+          }),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => setState(() => _showAnswers = !_showAnswers),
+            icon: Icon(_showAnswers ? Icons.visibility_off_rounded : Icons.key_rounded),
+            label: Text(_showAnswers ? 'إخفاء الإجابات النموذجية' : 'عرض الإجابات النموذجية للمعلم'),
+            style: OutlinedButton.styleFrom(foregroundColor: royalGreen,
+                side: const BorderSide(color: royalGreen), padding: const EdgeInsets.symmetric(vertical: 13)),
+          ),
+          const SizedBox(height: 8),
+          const Text('هذه معاينة منظمة داخل التطبيق. يمكن للمعلم اعتماد الإجابات المقبولة بحسب صياغة التلميذ ومستوى الصف، ومراجعة توافقها مع الدرس قبل التصحيح.',
+              textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: textColor, height: 1.7)),
+        ],
+      ),
+    );
+  }
+}
