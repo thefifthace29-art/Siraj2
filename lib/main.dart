@@ -741,10 +741,14 @@ class ArabicPage extends StatelessWidget {
             title: 'الأنشطة الشفهية والكتابية',
             subtitle: 'الاستماع والتعبير والإملاء والتدريبات',
             color: const Color(0xFF8A6A22),
-            onTap: () => showComingSoon(
+            onTap: () {
+            Navigator.push(
               context,
-              'الأنشطة الشفهية والكتابية',
-            ),
+              MaterialPageRoute(
+                builder: (_) => const OralWrittenActivitiesPage(),
+              ),
+            );
+          },
           ),
           ArabicFeatureCard(
             icon: Icons.assignment_rounded,
@@ -768,6 +772,491 @@ class ArabicPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ==================== الأنشطة الشفهية والكتابية ====================
+
+class TextbookLessonActivities {
+  final String title;
+  final String unit;
+  final int page;
+  final String theme;
+  final List<String> oral;
+  final List<String> written;
+
+  const TextbookLessonActivities({
+    required this.title,
+    required this.unit,
+    required this.page,
+    required this.theme,
+    required this.oral,
+    required this.written,
+  });
+}
+
+const List<TextbookLessonActivities> textbookActivities = [
+  TextbookLessonActivities(
+    title: 'اليوم الأول في المدرسة', unit: 'الوحدة الأولى: المواطنة والانتماء', page: 4,
+    theme: 'الاستعداد للمدرسة، وصف الصورة، احترام المدرسة والانتماء إلى الوطن',
+    oral: [
+      'أتأمّل صورة الدرس وأصف المكان والأشخاص والأشياء التي أراها، مستخدمًا جملًا واضحة.',
+      'أحكي لزملائي كيف أستعدّ للمدرسة، وأذكر ثلاثة أشياء أضعها في حقيبتي ولماذا أحتاج إليها.',
+      'أروي أحداث صباح آلاء بترتيبها: الاستيقاظ، تجهيز الحقيبة، ثم الذهاب إلى المدرسة.',
+      'أكمل شفويًا: اسم مدرستي هو…، اسم معلّمي هو…، وأكثر شيء أحبّه في مدرستي هو…',
+    ],
+    written: [
+      'أكتب جملتين تصفان استعدادي للمدرسة في الصباح.',
+      'أرتّب أحداث ذهاب آلاء إلى المدرسة وفق تسلسلها في النص، ثم أكتب رقم كل حدث.',
+      'أكتب ثلاث كلمات من الدرس، ثم أذكر مفرد كل كلمة أو جمعها بحسب ما يناسب.',
+      'أكتب جملة تعبّر عن حبّي لمدرستي أو لوطني، مع وضع نقطة في نهايتها.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'من حقي أن أتعلّم', unit: 'الوحدة الأولى: المواطنة والانتماء', page: 12,
+    theme: 'حق الطفل في التعليم، الحقوق والواجبات، الحلم والمستقبل',
+    oral: [
+      'أصف الصورة في بداية الدرس، وأذكر ما الذي يتعلّمه الأطفال وكيف يساعدهم التعلّم.',
+      'أتحدّث مع زميلي عن حقّ من حقوق الطفل، ثم أذكر واجبًا يقابله في الأسرة أو المدرسة.',
+      'أكمل شفويًا: من حقّي أن…، ومن واجبي تجاه أسرتي أن…، وتجاه وطني أن…',
+      'أختار مهنة أحلم بها وأشرح كيف يساعدني التعلّم على تحقيق هذا الحلم.',
+    ],
+    written: [
+      'أكتب حقّين من حقوق الطفل وواجبين ألتزم بهما في المدرسة.',
+      'أكمل جملة: أتعلم اليوم لكي…، وأكتب بعدها جملة توضّح حلمي للمستقبل.',
+      'أستخرج من الدرس كلمة تدلّ على العلم، وأكتب كلمة قريبة من معناها.',
+      'أكتب فقرة قصيرة من ثلاث جمل عن أهمية التعلّم في حياتي.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'وطني', unit: 'الوحدة الأولى: المواطنة والانتماء', page: 20,
+    theme: 'حبّ الوطن، وصف المشاهد، النشيد والتعبير عن الانتماء',
+    oral: [
+      'أصف الصورة المجاورة للدرس، ثم أختار مشهدًا أعجبني وأتحدّث عنه أمام زملائي.',
+      'أذكر ثلاث علامات تدلّ على حبّ الوطن، وأشرح كيف أعبّر عن هذا الحبّ في المدرسة.',
+      'أختار مقطعًا من النشيد أعجبني وألقيه بإلقاء واضح، مع مراعاة نبرة الصوت.',
+      'أتخيّل أنني أعرّف زائرًا بوطني سورية؛ أذكر مكانًا أو عادة أو صفة أعتزّ بها.',
+    ],
+    written: [
+      'أكتب ثلاث كلمات من الدرس تعبّر عن الوطن أو الانتماء.',
+      'أكتب جملتين عن عمل أستطيع القيام به للمحافظة على مدرستي ووطني.',
+      'أرتّب كلمات معطاة لتكوين جملة مفيدة عن الوطن، ثم أقرأها بصوت مسموع.',
+      'أكتب عبارة جميلة أوجّهها إلى وطني، وأزيّنها في دفتري.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'الزيتونة والريح', unit: 'الوحدة الأولى: المواطنة والانتماء', page: 27,
+    theme: 'فهم الحكاية، صفات الشخصيات، الحوار واستخلاص العبرة',
+    oral: [
+      'أروي ما فهمته من حكاية الزيتونة والريح، وأحدّد الشخصيتين الرئيسيتين.',
+      'أقارن شفويًا بين صفات الزيتونة والريح، وأذكر موقفًا من الحكاية يدعم رأيي.',
+      'أمثّل مع زميلي حوارًا قصيرًا بين الزيتونة والريح، مع تغيير نبرة الصوت بحسب الشخصية.',
+      'أذكر العبرة التي تعلّمتها من الحكاية، وأعطي مثالًا من حياتي يشبهها.',
+    ],
+    written: [
+      'أكتب اسمَي الشخصيتين، ثم أذكر صفة مناسبة لكل شخصية.',
+      'أكتب بداية الحكاية وحدثًا مهمًا ونهايتها في ثلاث جمل مرتّبة.',
+      'أختار كلمة من الدرس وأكتب ضدّها أو مرادفها إن كنت أعرفه.',
+      'أكتب نصيحة قصيرة تعلّمتها من الحكاية.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'هيا نسبح', unit: 'الوحدة الثانية: الرياضة والفنون', page: 36,
+    theme: 'الرياضة، السلامة، الحركة والإيقاع',
+    oral: [
+      'أذكر فوائد السباحة أو الرياضة للجسم، وأشرح لماذا نمارسها بأمان.',
+      'أصف خطوات الاستعداد للسباحة، وأذكر قاعدة سلامة لا يجوز أن أنساها.',
+      'أنشد مقطعًا من النص مع زملائي، وأحافظ على الإيقاع ووضوح الكلمات.',
+      'أجري حوارًا مع زميل يسألني عن رياضتي المفضّلة وفوائدها.',
+    ],
+    written: [
+      'أكتب ثلاث كلمات مرتبطة بالرياضة أو الماء وردت في الدرس أو تناسب موضوعه.',
+      'أرتّب خطوات الاستعداد لنشاط رياضي ترتيبًا منطقيًا.',
+      'أكتب جملتين عن رياضتي المفضّلة، مستخدمًا فعلًا مناسبًا في كل جملة.',
+      'أكتب نصيحة قصيرة لصديق عن ممارسة الرياضة بأمان.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'تحدّي الأذكياء', unit: 'الوحدة الثانية: الرياضة والفنون', page: 44,
+    theme: 'التفكير، حلّ المشكلات، التعاون واحترام المحاولة',
+    oral: [
+      'أشرح لزملائي كيف أبدأ حلّ لغز: أقرأ المطلوب، وألاحظ المعطيات، ثم أجرّب حلًا.',
+      'أشارك في تحدٍّ شفهي مع مجموعتي، وأذكر سبب اختياري للإجابة لا الإجابة وحدها.',
+      'أصوغ لغزًا بسيطًا من عندي عن شيء في الصف، وأدع زملائي يحاولون حلّه.',
+      'أصف موقفًا احتجت فيه إلى التفكير أو التعاون للوصول إلى حلّ.',
+    ],
+    written: [
+      'أحلّ لغزًا يقدّمه المعلّم، وأكتب خطوات تفكيري بكلمات قصيرة.',
+      'أرتّب ثلاث تعليمات مبعثرة لتصبح طريقة واضحة لحلّ مشكلة.',
+      'أكتب سؤالًا ذكيًا من إنشائي مع إجابته، ثم أتبادل السؤال مع زميل.',
+      'أكمل جملة: عندما لا أعرف الحلّ فإنني…، وأذكر طريقة مفيدة للمحاولة.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'عشّاق الأغاني', unit: 'الوحدة الثانية: الرياضة والفنون', page: 51,
+    theme: 'الإنشاد، الإيقاع، الاستماع، التعبير الفني والعمل الجماعي',
+    oral: [
+      'أستمع إلى النشيد بانتباه، ثم أذكر الفكرة أو الشعور الذي وصل إليّ.',
+      'أختار مقطعًا أعجبني وأنشده مع مجموعتي بصوت واضح ومنظّم.',
+      'أصف الفرق بين إلقاء الكلمات بسرعة كبيرة وإلقائها بإيقاع مناسب.',
+      'أتعاون مع زملائي لاختيار قائد للإنشاد وتوزيع الأدوار بين أفراد المجموعة.',
+    ],
+    written: [
+      'أكتب عنوان النشيد، ثم أكتب كلمة أو عبارة لفتت انتباهي.',
+      'أرتّب كلمات مبعثرة من اختيار المعلّم لتكوين جملة مفيدة.',
+      'أكتب جملتين عن الفنّ أو الإنشاد، مع مراعاة المسافة بين الكلمات.',
+      'أرسم بطاقة صغيرة لنشاط إنشادي وأكتب عليها عبارة مناسبة.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'العالِم الطبيب', unit: 'الوحدة الثانية: الرياضة والفنون', page: 57,
+    theme: 'العلم والطب، السيرة، خدمة الناس وأهمية المعرفة',
+    oral: [
+      'أذكر ما تعلّمته من النص عن العالم الطبيب، وأوضّح كيف أفاد الناس بعلمه.',
+      'أشرح لماذا يحتاج الطبيب إلى التعلّم والملاحظة والدقّة في عمله.',
+      'أمثّل حوارًا قصيرًا بين طفل وطبيب عن المحافظة على الصحة.',
+      'أذكر عالمًا أو صاحب مهنة نافعة أعرفه، وأتحدّث عن عمله باحترام.',
+    ],
+    written: [
+      'أكتب ثلاث صفات أراها مهمّة في العالم أو الطبيب.',
+      'أكتب جملتين تلخّصان فائدة العلم في خدمة المجتمع.',
+      'أرتّب أحداثًا أو معلومات يختارها المعلّم من النص بحسب ورودها.',
+      'أكتب سؤالًا أودّ أن أطرحه على طبيب، ثم أكتب إجابة متوقّعة مناسبة.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'جرة الفخّار وجرة الحديد', unit: 'الوحدة الثالثة: دنيا العلوم', page: 68,
+    theme: 'الاستماع والفهم، المقارنة، خصائص المواد واستخلاص الفكرة',
+    oral: [
+      'أستمع إلى النص كاملًا دون مقاطعة، ثم أذكر الشخصيات أو الأشياء التي وردت فيه.',
+      'أقارن بين الفخّار والحديد من حيث الصلابة أو قابلية الكسر، بحسب ما تعلّمته.',
+      'أتوقّع ما قد يحدث عند اصطدام الجرتين، ثم أذكر سبب توقّعي.',
+      'أعيد سرد أهم أحداث النص بترتيبها، مستخدمًا: أولًا، ثم، أخيرًا.',
+    ],
+    written: [
+      'أملأ جدول مقارنة بسيطًا بين الفخّار والحديد من حيث صفة لكل منهما.',
+      'أكتب جملة توضّح الفكرة التي فهمتها من النص المسموع.',
+      'أختار عنوانًا آخر مناسبًا للنص وأكتب سبب اختياري.',
+      'أكتب نصيحة مستفادة من القصة في جملة واحدة.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'رحلة الفضاء', unit: 'الوحدة الثالثة: دنيا العلوم', page: 71,
+    theme: 'الفضاء والكواكب، الخيال العلمي، الوصف وتسلسل الأحداث',
+    oral: [
+      'أتخيّل أنني في رحلة إلى الفضاء، وأصف ما أتوقّع رؤيته من نافذة المركبة.',
+      'أذكر سؤالين عن الفضاء أودّ معرفة إجابتهما، ثم أستمع إلى أسئلة زملائي.',
+      'أعيد سرد مشاهد الرحلة بترتيبها مستخدمًا عبارات تدلّ على الزمن.',
+      'أصف كوكبًا أو جرمًا فضائيًا أعرفه، وأميّزه عن الأرض بصفة واحدة.',
+    ],
+    written: [
+      'أكتب قائمة من أربع كلمات ترتبط بالفضاء والرحلات الفضائية.',
+      'أكتب ثلاث جمل تصف رحلة خيالية إلى الفضاء مع بداية وحدث ونهاية.',
+      'أرتّب صورًا أو جملًا عن رحلة فضائية بحسب تسلسلها.',
+      'أكتب سؤالًا علميًا عن الفضاء، ثم أبحث عن إجابته بمساعدة المعلّم أو الكتاب.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'متحف دمشق التربوي', unit: 'الوحدة الثالثة: دنيا العلوم', page: 78,
+    theme: 'المتاحف، التعلّم بالمشاهدة، وصف المعروضات والمحافظة على التراث',
+    oral: [
+      'أصف ما أتوقّع مشاهدته في متحف تربوي، وأذكر كيف نتصرّف داخله.',
+      'أختار معروضًا أتخيّل وجوده في المتحف وأشرح ماذا يمكن أن نتعلّم منه.',
+      'أقدّم نفسي دليلًا للمتحف وأشرح لزملائي عن معروض واحد في جملتين.',
+      'أتحدّث عن أهمية المحافظة على الآثار والأشياء القديمة وعدم العبث بها.',
+    ],
+    written: [
+      'أكتب ثلاث قواعد يجب الالتزام بها عند زيارة المتحف.',
+      'أكتب بطاقة تعريف قصيرة لمعروض خيالي: اسمه، ووصفه، وفائدته.',
+      'أكتب فقرة قصيرة عن زيارة تعليمية أتمنى القيام بها.',
+      'أختار كلمة من موضوع المتحف وأضعها في جملة مفيدة من إنشائي.',
+    ],
+  ),
+  TextbookLessonActivities(
+    title: 'هل تعلم؟', unit: 'الوحدة الثالثة: دنيا العلوم', page: 85,
+    theme: 'المعلومات العامة، القراءة الاستكشافية، السؤال والجواب',
+    oral: [
+      'أشارك معلومة مفيدة أعرفها، وأشرح كيف أو متى تعلّمتها.',
+      'أستمع إلى معلومة يقدّمها زميلي، ثم أعيد صياغتها بكلماتي.',
+      'أطرح سؤالًا يبدأ بـ «هل تعلم لماذا…؟» وأدع زملائي يتوقّعون الإجابة.',
+      'أميّز بين معلومة أعرفها ومعلومة أحتاج إلى التحقّق منها في الكتاب أو بمساعدة المعلّم.',
+    ],
+    written: [
+      'أكتب معلومتين قصيرتين بصيغة «هل تعلم أن…؟» بعد التحقّق من صحتهما مع المعلّم.',
+      'أكتب سؤالًا عن الطبيعة أو العلوم، وأترك سطرًا للإجابة بعد البحث.',
+      'أرتّب معلومة قصيرة إلى جملتين مترابطتين مستخدمًا أداة ربط مناسبة.',
+      'أصمّم بطاقة «هل تعلم؟» بعنوان ومعلومة واضحة ورسم صغير.',
+    ],
+  ),
+];
+
+class OralWrittenActivitiesPage extends StatelessWidget {
+  const OralWrittenActivitiesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        title: const Text('الأنشطة الشفهية والكتابية',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: royalGreen,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: gold, width: 1.2),
+            ),
+            child: const Column(
+              children: [
+                Icon(Icons.record_voice_over_rounded, color: gold, size: 42),
+                SizedBox(height: 10),
+                Text('نتحدّث، نفكّر، ثم نكتب',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: gold, fontSize: 22,
+                        fontWeight: FontWeight.bold)),
+                SizedBox(height: 8),
+                Text(
+                  'أنشطة مرتبطة بدروس كتاب العربية لغتي للصف الثاني. اختر الدرس، ثم انتقل بين الأنشطة الشفهية والكتابية.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, height: 1.8),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Row(
+            children: [
+              Icon(Icons.menu_book_rounded, color: royalGreen),
+              SizedBox(width: 8),
+              Text('اختر درسًا من الكتاب', style: TextStyle(
+                  color: textColor, fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...textbookActivities.map((lesson) => Card(
+                color: Colors.white,
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(color: gold.withOpacity(0.55)),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  leading: Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: royalGreen.withOpacity(0.09),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(Icons.auto_stories_rounded,
+                        color: royalGreen),
+                  ),
+                  title: Text(lesson.title, style: const TextStyle(
+                      color: royalGreen, fontWeight: FontWeight.bold)),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Text('${lesson.unit}\nصفحة ${lesson.page} · ${lesson.theme}',
+                        style: const TextStyle(height: 1.5, fontSize: 12)),
+                  ),
+                  isThreeLine: true,
+                  trailing: const Icon(Icons.arrow_back_ios_new_rounded,
+                      color: gold, size: 18),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => LessonActivitiesDetailPage(lesson: lesson),
+                  )),
+                ),
+              )),
+          const SizedBox(height: 8),
+          const Text(
+            'ملاحظة: الأنشطة مصاغة للتدريب انطلاقًا من موضوعات الدروس ومهاراتها في الكتاب، ويمكن تنفيذها شفهيًا في الصف أو كتابيًا في الدفتر.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: textColor, fontSize: 12, height: 1.7),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LessonActivitiesDetailPage extends StatefulWidget {
+  final TextbookLessonActivities lesson;
+  const LessonActivitiesDetailPage({super.key, required this.lesson});
+
+  @override
+  State<LessonActivitiesDetailPage> createState() =>
+      _LessonActivitiesDetailPageState();
+}
+
+class _LessonActivitiesDetailPageState extends State<LessonActivitiesDetailPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+  final Set<String> _completed = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lesson = widget.lesson;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: royalGreen,
+        foregroundColor: Colors.white,
+        title: Text(lesson.title, style: const TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 18)),
+        centerTitle: true,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: gold,
+          labelColor: gold,
+          unselectedLabelColor: Colors.white,
+          tabs: const [
+            Tab(icon: Icon(Icons.record_voice_over_rounded), text: 'أنشطة شفهية'),
+            Tab(icon: Icon(Icons.edit_note_rounded), text: 'أنشطة كتابية'),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            color: gold.withOpacity(0.13),
+            child: Text(
+              'الصفحة ${lesson.page} · ${lesson.theme}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: textColor, height: 1.6),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildActivities(lesson.oral, 'شفهي'),
+                _buildActivities(lesson.written, 'كتابي'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivities(List<String> activities, String type) {
+    final doneCount = activities
+        .where((activity) => _completed.contains('$type:$activity'))
+        .length;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text('أنجزت $doneCount من ${activities.length}',
+                style: const TextStyle(color: royalGreen,
+                    fontWeight: FontWeight.bold))),
+            Text('${(doneCount / activities.length * 100).round()}%',
+                style: const TextStyle(color: royalGreen,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: LinearProgressIndicator(
+            value: doneCount / activities.length,
+            minHeight: 7,
+            backgroundColor: gold.withOpacity(0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(royalGreen),
+          ),
+        ),
+        const SizedBox(height: 14),
+        ...List.generate(activities.length, (index) {
+          final activity = activities[index];
+          final key = '$type:$activity';
+          final isDone = _completed.contains(key);
+          return Card(
+            color: Colors.white,
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(
+                color: isDone ? royalGreen.withOpacity(0.6) : gold.withOpacity(0.5),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isDone ? royalGreen : gold.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text('${index + 1}', style: TextStyle(
+                        color: isDone ? Colors.white : royalGreen,
+                        fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(activity, style: const TextStyle(
+                            color: textColor, height: 1.7, fontSize: 14)),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: () => setState(() {
+                              if (isDone) {
+                                _completed.remove(key);
+                              } else {
+                                _completed.add(key);
+                              }
+                            }),
+                            icon: Icon(isDone ? Icons.check_circle : Icons.circle_outlined,
+                                size: 18),
+                            label: Text(isDone ? 'تمّ الإنجاز' : 'وضع علامة: أُنجز'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: royalGreen,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
@@ -2788,162 +3277,4 @@ class _TextbookPageState extends State<TextbookPage> {
           Expanded(
             child: loadingError != null
                 ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.error_outline_rounded,
-                            color: Colors.redAccent,
-                            size: 48,
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'تعذّر فتح الكتاب.',
-                            style: TextStyle(
-                              color: royalGreen,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'تحقّق من اسم ملف PDF ومساره في المستودع، ثم أعد البناء.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(height: 1.7),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : PdfViewPinch(
-                    controller: pdfController,
-                    onPageChanged: (page) {
-                      if (mounted) {
-                        setState(() => currentPage = page);
-                      }
-                    },
-                    builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
-                      options: const DefaultBuilderOptions(),
-                      documentLoaderBuilder: (_) => const Center(
-                        child: CircularProgressIndicator(
-                          color: royalGreen,
-                        ),
-                      ),
-                      pageLoaderBuilder: (_) => const Center(
-                        child: CircularProgressIndicator(
-                          color: royalGreen,
-                        ),
-                      ),
-                      errorBuilder: (_, error) => const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(24),
-                          child: Text(
-                            'حدث خطأ أثناء عرض صفحات الكتاب.',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ==================== بطاقة القسم الرئيسية ====================
-
-class SectionCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const SectionCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(22),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          padding: const EdgeInsets.all(13),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: gold.withOpacity(0.75),
-              width: 1.1,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 47,
-                height: 47,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const Spacer(),
-              Text(
-                title,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 7),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: Color(0xFF6B746D),
-                  fontSize: 12,
-                  height: 1.6,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      'استكشاف القسم',
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_back_rounded,
-                    color: color,
-                    size: 15,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+             
