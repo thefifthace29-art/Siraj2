@@ -752,12 +752,14 @@ class ArabicPage extends StatelessWidget {
           ),
           ArabicFeatureCard(
             icon: Icons.assignment_rounded,
-            title: 'أوراق العمل والامتحانات',
-            subtitle: 'تدريبات وتقويمات مرتبطة بمحتوى الكتاب',
+            title: 'أوراق العمل والمذاكرات والامتحانات',
+            subtitle: 'نماذج جاهزة مرتبطة بدروس الكتاب وتعمل دون إنترنت',
             color: const Color(0xFF426B55),
-            onTap: () => showComingSoon(
+            onTap: () => Navigator.push(
               context,
-              'أوراق العمل والامتحانات',
+              MaterialPageRoute(
+                builder: (_) => const WorksheetsExamsPage(),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -3274,7 +3276,4 @@ class _TextbookPageState extends State<TextbookPage> {
               ],
             ),
           ),
-          Expanded(
-            child: loadingError != null
-                ? Center(
-             
+       
