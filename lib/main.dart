@@ -1,4 +1,4 @@
-import 'dart:async';
+ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'lesson_prep_page.dart';
@@ -2932,8 +2932,7 @@ class BookIndexPage extends StatelessWidget {
       ],
     },
   ];
-
-  @override
+override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
