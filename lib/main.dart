@@ -3568,29 +3568,26 @@ const List<ReadyPaper> readyPapers = [
     PaperQuestion('أكتب فقرة من أربع جمل عن موضوع أحببته في الكتاب.', 'تُقبل فقرة من أربع جمل مترابطة وسليمة ومتصلة بأحد موضوعات الكتاب.', marks: 4),
     PaperQuestion('أراجع كتابتي وأضع علامات الترقيم المناسبة.', 'تُقيّم سلامة الكتابة واستخدام النقطة وعلامة الاستفهام حيث تلزم.'),
   ]),
-  ReadyPaper(title: 'نموذج امتحان (أ)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
-    PaperQuestion('أكتب جملة عن أهمية التعلّم.', 'إجابة مناسبة مثل: يساعدني التعلّم على بناء مستقبلي.', marks: 2),
-    PaperQuestion('أذكر سلوكين يدلّان على حبّ الوطن.', 'المحافظة على النظافة واحترام رموز الوطن.', marks: 2),
-    PaperQuestion('أذكر فائدتين للرياضة.', 'تقوّي الجسم وتحافظ على الصحة.', marks: 2),
-    PaperQuestion('أذكر عملًا يقوم به الطبيب.', 'يعالج المرضى ويساعدهم على المحافظة على صحتهم.', marks: 2),
-    PaperQuestion('أقارن بين جرة الفخار وجرة الحديد.', 'الفخار قابل للكسر، والحديد أكثر صلابة.', marks: 2),
-    PaperQuestion('أكتب جملتين عن موضوع أعجبني في الكتاب.', 'جملتان مترابطتان وسليمتان عن أحد موضوعات الكتاب.', marks: 4),
+  ReadyPaper(title: 'نموذج امتحان (أ)', subtitle: 'خمسة أسئلة متنوعة – خمسة بنود لكل سؤال', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('السؤال الأول: صِلْ بين المفرد والجمع.\nالمفرد                         الجمع\nقلم                            حيوانات\n....................             أقلام\nكتاب                           أشجار\nشجرة                           كتب\nحيوان                          ....................', 'قلم ← أقلام؛ حيوان ← حيوانات؛ كتاب ← كتب؛ شجرة ← أشجار.'),
+    PaperQuestion('السؤال الثاني: اختر الإجابة الصحيحة.\n1. جمع كلمة (قلم): أقلام / قلمان / قلم\n2. الكلمة التي تبدأ بهمزة قطع: أحمد / المدرسة / الكتاب\n3. علامة نهاية السؤال: النقطة / الاستفهام / الفاصلة\n4. مفرد كلمة (أشجار): شجرة / شجرتان / شجرات\n5. الكلمة الصحيحة: مدرسة / مدرست / مدرسته', '1. أقلام. 2. أحمد. 3. علامة الاستفهام. 4. شجرة. 5. مدرسة.'),
+    PaperQuestion('السؤال الثالث: املأ الفراغ بالكلمة المناسبة.\nالكلمات: (وطني – المدرسة – أقلام – مدرستي – شجرة)\n1. أحب ............... وأفتخر به.\n2. أذهب إلى ............... لأتعلّم.\n3. جمع كلمة قلم هو ...............\n4. أحافظ على نظافة ...............\n5. أزرع ............... في الحديقة.', '1. وطني. 2. المدرسة. 3. أقلام. 4. مدرستي. 5. شجرة.'),
+    PaperQuestion('السؤال الرابع: ضع إشارة (✓) أو (✗).\n1. نحافظ على نظافة مدرستنا. (     )\n2. جمع كلمة قلم هو أقلام. (     )\n3. تنتهي الجملة الاستفهامية بنقطة. (     )\n4. الوطن هو المكان الذي ننتمي إليه. (     )\n5. كلمة مدرسة تنتهي بتاء مربوطة. (     )', '1. ✓  2. ✓  3. ✗  4. ✓  5. ✓'),
+    PaperQuestion('السؤال الخامس: سطر الإملاء.\nيُملي المعلّم الكلمات الآتية على التلميذ:\n1. مدرسة\n2. وطن\n3. شجرة\n4. كتاب\n5. تعلّم\n\n................................................................\n................................................................', 'الكلمات: مدرسة، وطن، شجرة، كتاب، تعلّم.'),
   ]),
-  ReadyPaper(title: 'نموذج امتحان (ب)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
-    PaperQuestion('أذكر حقًّا من حقوق الطفل وواجبًا من واجباته.', 'من حقي أن أتعلم، ومن واجبي احترام الآخرين.', marks: 2),
-    PaperQuestion('أكتب نصيحة لصديق يريد تعلّم السباحة.', 'يتعلم السباحة بإشراف مدرب أو شخص بالغ، ويلتزم قواعد السلامة.', marks: 2),
-    PaperQuestion('كيف يساعدنا التفكير في حلّ التحديات؟', 'يساعدنا على تحليل السؤال وتجربة الحلول المناسبة.', marks: 2),
-    PaperQuestion('أذكر فائدة من زيارة المتحف.', 'التعرّف إلى آثار الماضي والتعلّم منها.', marks: 2),
-    PaperQuestion('كيف أتحقق من معلومة سمعتها؟', 'أراجع مصدرًا موثوقًا وأسأل المعلم أو أبحث في الكتاب.', marks: 2),
-    PaperQuestion('أكتب فقرة قصيرة عن مدرستي أو صحتي أو وطني.', 'فقرة مترابطة من ثلاث أو أربع جمل مناسبة للموضوع.', marks: 4),
+  ReadyPaper(title: 'نموذج امتحان (ب)', subtitle: 'خمسة أسئلة متنوعة – خمسة بنود لكل سؤال', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('السؤال الأول: صِلْ بين المفرد والجمع.\nطالب                         نجوم\nنجمة                          طلاب\nدفتر                          أزهار\nزهرة                          دفاتر\nأقلام                          قلم', 'طالب ← طلاب؛ نجمة ← نجوم؛ دفتر ← دفاتر؛ زهرة ← أزهار؛ قلم ← أقلام.'),
+    PaperQuestion('السؤال الثاني: اختر الإجابة الصحيحة.\n1. ضد كلمة (قوي): ضعيف / طويل / سعيد\n2. الكلمة التي تنتهي بتاء مربوطة: مدرسة / بيت / نبات\n3. نضع في نهاية الجملة التامة: نقطة / فاصلة / استفهام دائمًا\n4. مفرد كلمة (كتب): كاتب / كتاب / مكتبة\n5. الكلمة التي تدل على مهنة: طبيب / حديقة / نافذة', '1. ضعيف. 2. مدرسة. 3. نقطة. 4. كتاب. 5. طبيب.'),
+    PaperQuestion('السؤال الثالث: املأ الفراغ بالكلمة المناسبة.\nالكلمات: (الطبيب – الرياضة – المتحف – القمر – الحديد)\n1. يساعد ............... المرضى.\n2. تقوّي ............... أجسامنا.\n3. نشاهد أشياء قديمة في ...............\n4. نرى ............... في السماء ليلًا.\n5. تُصنع بعض الأبواب من ...............', '1. الطبيب. 2. الرياضة. 3. المتحف. 4. القمر. 5. الحديد.'),
+    PaperQuestion('السؤال الرابع: ضع إشارة (✓) أو (✗).\n1. نمارس الرياضة للمحافظة على صحتنا. (     )\n2. الفخار لا يمكن أن ينكسر. (     )\n3. الطبيب يساعد المرضى. (     )\n4. نحافظ على المعروضات في المتحف. (     )\n5. نكتب السؤال دون علامة استفهام. (     )', '1. ✓  2. ✗  3. ✓  4. ✓  5. ✗'),
+    PaperQuestion('السؤال الخامس: سطر الإملاء.\nيُملي المعلّم الكلمات الآتية على التلميذ:\n1. طبيب\n2. رياضة\n3. متحف\n4. القمر\n5. حديد\n\n................................................................\n................................................................', 'الكلمات: طبيب، رياضة، متحف، القمر، حديد.'),
   ]),
-  ReadyPaper(title: 'نموذج امتحان (ج)', subtitle: 'امتحان تدريبي شامل', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
-    PaperQuestion('أكمل: من واجبي تجاه مدرستي أن…', 'أحافظ على نظافتها وأحترم المعلم والزملاء.', marks: 2),
-    PaperQuestion('أذكر شيئًا مصنوعًا من الفخار وآخر من الحديد.', 'جرة فخارية وباب حديدي، أو مثالان صحيحان آخران.', marks: 2),
-    PaperQuestion('أذكر اسم جرم سماوي ووسيلة للوصول إلى الفضاء.', 'القمر أو الشمس أو النجوم؛ مركبة فضائية أو صاروخ.', marks: 2),
-    PaperQuestion('أذكر سلوكين يساعدان على المحافظة على الصحة.', 'غسل اليدين وتناول غذاء صحي مثلًا.', marks: 2),
-    PaperQuestion('أكتب جملة استفهامية عن موضوع علمي.', 'مثال: كيف يصل روّاد الفضاء إلى القمر؟', marks: 2),
-    PaperQuestion('أكتب أربع جمل مترابطة عن موضوع من موضوعات الكتاب.', 'تُقيّم الجمل من حيث ارتباطها بالموضوع وسلامة اللغة والترابط.', marks: 4),
+  ReadyPaper(title: 'نموذج امتحان (ج)', subtitle: 'خمسة أسئلة متنوعة – خمسة بنود لكل سؤال', category: 'امتحان', unit: 'الفصل الأول', pages: 'الوحدات 1–3', questions: [
+    PaperQuestion('السؤال الأول: صِلْ بين المفرد والجمع.\nجرة                           صواريخ\nنجم                           جرار\nصاروخ                        أشجار\nشجرة                          نجوم\nكتاب                           كتب', 'جرة ← جرار؛ نجم ← نجوم؛ صاروخ ← صواريخ؛ شجرة ← أشجار؛ كتاب ← كتب.'),
+    PaperQuestion('السؤال الثاني: اختر الإجابة الصحيحة.\n1. جمع كلمة (شجرة): أشجار / شجرتان / شجر\n2. الكلمة التي تبدأ بهمزة قطع: إنسان / المدرسة / الكتاب\n3. نضع بين جملتين مرتبطتين: فاصلة / نقطة استفهام / لا شيء دائمًا\n4. ضد كلمة (قديم): حديث / بعيد / صغير\n5. الكلمة الصحيحة: رحلة / رحلت / رحله', '1. أشجار. 2. إنسان. 3. فاصلة عند الحاجة. 4. حديث. 5. رحلة.'),
+    PaperQuestion('السؤال الثالث: املأ الفراغ بالكلمة المناسبة.\nالكلمات: (الفضاء – الزيتون – المدرسة – الفخار – السؤال)\n1. أتعلم في ...............\n2. تنمو شجرة ............... في وطننا.\n3. ينطلق رواد الفضاء إلى ...............\n4. تُصنع الجرة أحيانًا من ...............\n5. أقرأ ............... جيدًا قبل الإجابة.', '1. المدرسة. 2. الزيتون. 3. الفضاء. 4. الفخار. 5. السؤال.'),
+    PaperQuestion('السؤال الرابع: ضع إشارة (✓) أو (✗).\n1. أقرأ السؤال بانتباه قبل الإجابة. (     )\n2. الحديد أضعف من الفخار دائمًا. (     )\n3. نحافظ على أشجار وطننا. (     )\n4. المتحف مكان للتعلم والتعرف إلى الماضي. (     )\n5. تنتهي الجملة الخبرية عادةً بنقطة. (     )', '1. ✓  2. ✗  3. ✓  4. ✓  5. ✓'),
+    PaperQuestion('السؤال الخامس: سطر الإملاء.\nيُملي المعلّم الكلمات الآتية على التلميذ:\n1. الفضاء\n2. زيتونة\n3. رحلة\n4. متحف\n5. وطن\n\n................................................................\n................................................................', 'الكلمات: الفضاء، زيتونة، رحلة، متحف، وطن.'),
   ]),
 ];
 
@@ -3672,7 +3669,7 @@ class _WorksheetsExamsPageState extends State<WorksheetsExamsPage> {
               title: Text(paper.title, style: const TextStyle(color: royalGreen,
                   fontWeight: FontWeight.bold)),
               subtitle: Padding(padding: const EdgeInsets.only(top: 5),
-                child: Text('${paper.subtitle}\n${paper.unit} · الصفحات: ${paper.pages}\n${paper.questions.length} أسئلة · ${paper.totalMarks} علامة',
+                child: Text('${paper.subtitle}\n${paper.unit} · الصفحات: ${paper.pages}\n${paper.questions.length} أسئلة${paper.category == 'امتحان' ? '' : ' · ${paper.totalMarks} علامة'}',
                     style: const TextStyle(height: 1.5, fontSize: 12))),
               isThreeLine: true,
               trailing: const Icon(Icons.chevron_left_rounded, color: gold, size: 27),
@@ -3741,8 +3738,17 @@ class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: gold.withOpacity(0.65))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Center(child: Text('الجمهورية العربية السورية', style: TextStyle(fontWeight: FontWeight.bold))),
-              const Center(child: Text('مادة اللغة العربية – الصف الثاني الأساسي', style: TextStyle(fontWeight: FontWeight.bold))),
+              if (paper.category == 'امتحان') ...[
+                const Center(child: Text('مديرية التربية في حلب', style: TextStyle(fontWeight: FontWeight.bold))),
+                const Center(child: Text('مجمع الباب التربوي', style: TextStyle(fontWeight: FontWeight.bold))),
+                const Center(child: Text('مدرسة الأندلس الثالثة', style: TextStyle(fontWeight: FontWeight.bold))),
+                const SizedBox(height: 5),
+                const Center(child: Text('الصف الثاني الابتدائي', style: TextStyle(fontWeight: FontWeight.bold))),
+                const Center(child: Text('المادة: العربية لغتي (مهارات شفوية أو كتابية)', style: TextStyle(fontWeight: FontWeight.bold))),
+              ] else ...[
+                const Center(child: Text('الجمهورية العربية السورية', style: TextStyle(fontWeight: FontWeight.bold))),
+                const Center(child: Text('مادة اللغة العربية – الصف الثاني الأساسي', style: TextStyle(fontWeight: FontWeight.bold))),
+              ],
               const SizedBox(height: 12),
               Text(paper.title, textAlign: TextAlign.center,
                   style: const TextStyle(color: royalGreen, fontWeight: FontWeight.bold, fontSize: 20)),
@@ -3751,16 +3757,21 @@ class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
                 controller: _studentNameController,
                 textDirection: TextDirection.rtl,
                 decoration: const InputDecoration(
-                  labelText: 'اسم التلميذ/ة',
+                  labelText: paper.category == 'امتحان' ? 'الاسم' : 'اسم التلميذ/ة',
                   border: OutlineInputBorder(),
                   isDense: true,
                 ),
               ),
               const SizedBox(height: 8),
-              Text('${paper.unit}  |  الصفحات المرجعية: ${paper.pages}',
-                  textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, height: 1.6)),
-              Text('الدرجة الكلية: ${paper.totalMarks}', textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: royalGreen)),
+              if (paper.category == 'امتحان')
+                const Text('الدرجة: ........................', textAlign: TextAlign.right,
+                    style: TextStyle(fontWeight: FontWeight.bold, color: royalGreen))
+              else ...[
+                Text('${paper.unit}  |  الصفحات المرجعية: ${paper.pages}',
+                    textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, height: 1.6)),
+                Text('الدرجة الكلية: ${paper.totalMarks}', textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: royalGreen)),
+              ],
             ]),
           ),
           const SizedBox(height: 12),
@@ -3786,7 +3797,8 @@ class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
                   const SizedBox(width: 9),
                   Expanded(child: Text(question.prompt, style: const TextStyle(
                       color: textColor, fontSize: 15, fontWeight: FontWeight.w600, height: 1.7))),
-                  Text('${question.marks} ع', style: const TextStyle(color: royalGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                  if (paper.category != 'امتحان')
+                    Text('${question.marks} ع', style: const TextStyle(color: royalGreen, fontSize: 12, fontWeight: FontWeight.bold)),
                 ]),
                 if (_showAnswers) ...[
                   const SizedBox(height: 10),
@@ -3795,10 +3807,18 @@ class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
                     child: Text('الإجابة النموذجية: ${question.answer}',
                         style: const TextStyle(color: royalGreen, height: 1.7))),
                 ] else ...[
-                  const SizedBox(height: 22),
-                  const Divider(height: 1),
-                  const SizedBox(height: 18),
-                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+                  if (paper.category == 'امتحان')
+                    ...List.generate(question.prompt.contains('سطر الإملاء') ? 2 : 1, (_) => const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Divider(height: 1),
+                    ))
+                  else ...[
+                    const SizedBox(height: 10),
+                    const Divider(height: 1),
+                    const SizedBox(height: 18),
+                    const Divider(height: 1),
+                  ],
                 ],
               ]),
             );
