@@ -3756,7 +3756,7 @@ class _ReadyPaperDetailPageState extends State<ReadyPaperDetailPage> {
               TextField(
                 controller: _studentNameController,
                 textDirection: TextDirection.rtl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: paper.category == 'امتحان' ? 'الاسم' : 'اسم التلميذ/ة',
                   border: OutlineInputBorder(),
                   isDense: true,
